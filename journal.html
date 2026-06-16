@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal — Chen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { cream:'#FAF7F2', espresso:'#2D2926', warm:'#6B5E52', caramel:'#B5936B', sand:'#D4B896', mist:'#E8DDD3', surface:'#F2EBE2' },
+        fontFamily: { serif:['Playfair Display','serif'], sans:['Inter','sans-serif'], mono:['DM Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    html { scrollbar-width:none; }
+    html::-webkit-scrollbar { display:none; }
+    body::after {
+      content:''; position:fixed; inset:-50%; width:200%; height:200%;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.028; pointer-events:none; z-index:9998; animation:grain 6s steps(8) infinite;
+    }
+    @keyframes grain {
+      0%{transform:translate(0,0)} 12%{transform:translate(-4%,-10%)} 25%{transform:translate(-12%,5%)}
+      37%{transform:translate(6%,-20%)} 50%{transform:translate(-4%,22%)} 62%{transform:translate(-13%,8%)}
+      75%{transform:translate(13%,0%)} 87%{transform:translate(2%,14%)}
+    }
+    .cur { position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+    #cur-dot  { width:7px; height:7px; background:#B5936B; }
+    #cur-ring { width:38px; height:38px; border:1px solid #B5936B; opacity:.55; transition:width .3s,height .3s,opacity .3s,background .3s; }
+    body:has(a:hover) #cur-ring, body:has(button:hover) #cur-ring { width:56px;height:56px;opacity:.2;background:#B5936B; }
+    #nav { transition:transform .4s cubic-bezier(.25,.46,.45,.94); }
+    .ul-link { position:relative; }
+    .ul-link::after { content:''; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:#B5936B; transition:width .3s; }
+    .ul-link:hover::after { width:100%; }
+    .rv { overflow:hidden; }
+    .ri { will-change:transform; transform:translateY(110%); }
+
+    /* Journal entries list */
+    .je { border-bottom:1px solid #E8DDD3; cursor:pointer; transition:background .25s, padding .25s; }
+    .je:hover { background:#F2EBE2; padding-left:1.5rem; padding-right:1.5rem; }
+
+    /* Full entry modal */
+    #entry-modal {
+      position:fixed; inset:0; z-index:9990;
+      background:#FAF7F2; overflow-y:auto;
+      transform:translateY(100%); transition:transform .5s cubic-bezier(.25,.46,.45,.94);
+    }
+    #entry-modal.open { transform:translateY(0); }
+    .prose-warm { max-width:640px; }
+    .prose-warm p { font-size:.9375rem; line-height:1.85; color:#6B5E52; margin-bottom:1.25em; }
+    .prose-warm h3 { font-family:'Playfair Display',serif; font-size:1.5rem; color:#2D2926; margin-bottom:.75em; margin-top:1.75em; }
+    .prose-warm blockquote { border-left:2px solid #B5936B; padding-left:1.25rem; margin:1.5em 0; font-style:italic; color:#6B5E52; }
+  </style>
+</head>
+<body class="bg-cream font-sans text-espresso overflow-x-hidden">
+
+<div class="cur hidden md:block" id="cur-dot"></div>
+<div class="cur hidden md:block" id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav" class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3.5 rounded-full border border-mist bg-cream/75 backdrop-blur-md">
+  <a href="index.html" class="font-mono text-[11px] tracking-[.25em] text-espresso uppercase">Chen</a>
+  <div class="hidden md:flex items-center gap-7">
+    <a href="gallery.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Gallery</a>
+    <a href="videos.html"  class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Videos</a>
+    <a href="journal.html" class="font-mono text-[10px] tracking-widest text-caramel uppercase ul-link">Journal</a>
+    <a href="about.html"   class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">About</a>
+  </div>
+  <button id="mbtn" class="md:hidden flex flex-col gap-[5px] p-1" aria-label="Menu">
+    <span id="mbar1" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+    <span id="mbar2" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+  </button>
+</nav>
+<div id="mmenu" class="fixed inset-0 bg-cream z-40 flex flex-col items-center justify-center gap-10 opacity-0 pointer-events-none transition-opacity duration-300">
+  <a href="gallery.html" class="font-serif text-5xl text-espresso">Gallery</a>
+  <a href="videos.html"  class="font-serif text-5xl text-espresso">Videos</a>
+  <a href="journal.html" class="font-serif text-5xl text-espresso">Journal</a>
+  <a href="about.html"   class="font-serif text-5xl text-espresso">About</a>
+</div>
+
+<!-- PAGE HEADER -->
+<header class="pt-36 pb-16 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-end">
+    <div>
+      <div class="rv"><p class="ri font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-3">Journal</p></div>
+      <div class="rv"><h1 class="ri font-serif text-[clamp(3rem,8vw,6rem)] leading-tight text-espresso">Written<br><em>Thoughts</em></h1></div>
+    </div>
+    <div class="rv">
+      <p class="ri font-sans text-sm text-warm leading-relaxed max-w-xs">
+        Writing is how the past stays close. These entries are unpolished and honest — notes from a life lived with intention.
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- ENTRIES LIST -->
+<main class="px-6 md:px-14 pb-24">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Year divider -->
+    <div class="flex items-center gap-6 mb-6">
+      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase">2024</p>
+      <div class="flex-1 h-px bg-mist"></div>
+    </div>
+
+    <div class="space-y-0 mb-16">
+      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e1">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel/70">001</span>
+            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">The quiet between moments</h2>
+          </div>
+          <div class="flex items-center gap-4 ml-8 md:ml-0">
+            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Reflection</span>
+            <span class="font-mono text-[10px] text-warm tracking-wider">June 12</span>
+          </div>
+        </div>
+        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          There's a certain stillness at the end of a long day — when the light turns gold and everything feels suspended in amber...
+        </p>
+        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
+      </div>
+
+      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e2">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel/70">002</span>
+            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">On slowing down</h2>
+          </div>
+          <div class="flex items-center gap-4 ml-8 md:ml-0">
+            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Life</span>
+            <span class="font-mono text-[10px] text-warm tracking-wider">May 28</span>
+          </div>
+        </div>
+        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          I used to think being productive meant always moving, always filling time. Lately I've started to see value in the pauses...
+        </p>
+        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
+      </div>
+
+      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e3">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel/70">003</span>
+            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Small things that matter</h2>
+          </div>
+          <div class="flex items-center gap-4 ml-8 md:ml-0">
+            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Everyday</span>
+            <span class="font-mono text-[10px] text-warm tracking-wider">April 15</span>
+          </div>
+        </div>
+        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window...
+        </p>
+        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
+      </div>
+
+      <div class="je py-8 px-4 -mx-4 rounded-sm group border-b border-mist" data-entry="e4">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel/70">004</span>
+            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">A walk I'll remember</h2>
+          </div>
+          <div class="flex items-center gap-4 ml-8 md:ml-0">
+            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Travel</span>
+            <span class="font-mono text-[10px] text-warm tracking-wider">March 2</span>
+          </div>
+        </div>
+        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          I didn't plan it. I just started walking and kept going until the city dissolved into something quieter, something that felt like mine...
+        </p>
+        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
+      </div>
+    </div>
+
+    <!-- 2023 -->
+    <div class="flex items-center gap-6 mb-6">
+      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase">2023</p>
+      <div class="flex-1 h-px bg-mist"></div>
+    </div>
+
+    <div class="space-y-0">
+      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e5">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel/70">005</span>
+            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Why I started this</h2>
+          </div>
+          <div class="flex items-center gap-4 ml-8 md:ml-0">
+            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Meta</span>
+            <span class="font-mono text-[10px] text-warm tracking-wider">Dec 31</span>
+          </div>
+        </div>
+        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          Memory is unreliable. It softens things, sharpens others, erases entire months. I needed somewhere to keep the truth of days as they happened...
+        </p>
+        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ENTRY MODAL -->
+<div id="entry-modal">
+  <div class="min-h-screen px-6 md:px-14 py-24">
+    <div class="max-w-7xl mx-auto">
+      <button id="modal-close" class="flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase hover:text-caramel transition-colors mb-14 group">
+        <span class="transition-transform group-hover:-translate-x-1">←</span>
+        <span>Back to Journal</span>
+      </button>
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-14">
+        <div class="md:sticky md:top-32 md:self-start">
+          <p id="modal-num" class="font-mono text-[10px] text-caramel mb-3"></p>
+          <h2 id="modal-title" class="font-serif text-3xl md:text-4xl text-espresso leading-tight mb-4"></h2>
+          <p id="modal-date" class="font-mono text-[10px] text-warm tracking-wider mb-3"></p>
+          <span id="modal-tag" class="font-mono text-[9px] text-caramel/70 border border-caramel/30 px-2 py-0.5 rounded-full"></span>
+          <div class="mt-8 w-8 h-px bg-caramel/30"></div>
+        </div>
+        <div id="modal-body" class="prose-warm"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="py-10 px-6 md:px-14 border-t border-mist">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+    <p class="font-mono text-[11px] tracking-[.3em] text-espresso uppercase">Chen</p>
+    <div class="flex items-center gap-7">
+      <a href="gallery.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Gallery</a>
+      <a href="videos.html"  class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Videos</a>
+      <a href="journal.html" class="font-mono text-[9px] tracking-wider text-caramel uppercase">Journal</a>
+      <a href="about.html"   class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">About</a>
+    </div>
+    <p class="font-mono text-[9px] text-warm/40 tracking-wider">© 2024 · All rights reserved</p>
+  </div>
+</footer>
+
+<script>
+const entries = {
+  e1: {
+    num:'001', title:'The quiet between moments', date:'June 12, 2024', tag:'Reflection',
+    body:`<p>There's a certain stillness at the end of a long day — when the light turns gold and everything feels suspended in amber. I've started to notice it more. The way the room shifts from afternoon into evening without asking permission.</p>
+<p>I was sitting by the window with a cup of tea that had gone cold when it occurred to me: most of life happens in the spaces between the things we think of as important. The drive home. The moment before sleep. The quiet Sunday mornings.</p>
+<blockquote>The most ordinary moments are the ones we forget first, and the ones we miss the most later.</blockquote>
+<p>I want to start paying more attention. Not in a forced, deliberate way — just... noticing. Letting things land. Letting the quiet be enough.</p>
+<h3>What I'm learning</h3>
+<p>Presence isn't a practice. It's a permission — to let go of what comes next, just for a little while, and to be exactly where you are.</p>`
+  },
+  e2: {
+    num:'002', title:'On slowing down', date:'May 28, 2024', tag:'Life',
+    body:`<p>I used to think that being productive meant always moving, always filling time. If I wasn't doing something, I was wasting something. It took a while — and some embarrassingly burnt-out months — to understand how wrong that was.</p>
+<p>Lately I've been walking more. Not to get anywhere in particular. Just walking. And I've started to notice things I never used to: the way shadows fall differently at different times of day, the sound a city makes when it's half-asleep.</p>
+<blockquote>Rest isn't the opposite of work. It's the thing that makes work possible.</blockquote>
+<p>I don't have any grand conclusions. I'm still learning how to slow down without feeling guilty about it. But I think that's the point — it's not a destination, it's just a different way of moving through time.</p>`
+  },
+  e3: {
+    num:'003', title:'Small things that matter', date:'April 15, 2024', tag:'Everyday',
+    body:`<p>Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window. My favourite playlist on a quiet commute. The satisfaction of finishing a chapter at just the right moment.</p>
+<p>None of these things are remarkable on their own. But together they make up something I'd call a good life — not in a grand, capital-G sense, but in the quiet, accumulated sense of days that felt worth living.</p>
+<h3>A small list</h3>
+<p>Things that made today okay: fresh air before 8am, a conversation that went somewhere unexpected, the way dinner smelled before I'd even tasted it, the moon being unexpectedly bright through the bedroom curtains.</p>
+<blockquote>Happiness, I think, is mostly a matter of noticing what's already there.</blockquote>
+<p>That's the practice, really. Not chasing more, but attending more closely to what's already here.</p>`
+  },
+  e4: {
+    num:'004', title:'A walk I\'ll remember', date:'March 2, 2024', tag:'Travel',
+    body:`<p>I didn't plan it. I just started walking and kept going until the city dissolved into something quieter, something that felt like mine.</p>
+<p>There was a point where I crossed a bridge and looked back and couldn't quite remember which direction I'd come from. It should have been unsettling. It wasn't. It felt like exactly the right kind of lost.</p>
+<p>I walked for about three hours total. Stopped at a bench near a small park I'd never noticed before — one of those in-between places that exists entirely for people who happen to need it. An old man was feeding pigeons with the serious concentration of someone doing something important. Maybe he was.</p>
+<blockquote>Sometimes the point of going out is not to arrive anywhere.</blockquote>
+<p>I came home tired and strangely settled. Took a long shower. Made eggs. The day felt finished in the best possible way — like something had actually happened, even if I couldn't quite explain what.</p>`
+  },
+  e5: {
+    num:'005', title:'Why I started this', date:'December 31, 2023', tag:'Meta',
+    body:`<p>Memory is unreliable. It softens things, sharpens others, erases entire months. I needed somewhere to keep the truth of days as they happened — not the highlight reel, not the performed version, just the actual texture of being alive.</p>
+<p>This is that place. It's not for anyone else, but it's not secret either. It's just... honest. A record. A way of saying: this happened, I was here, it mattered — or it didn't, but either way, I paid attention.</p>
+<h3>What I hope this becomes</h3>
+<p>Something to look back on when I'm older and wondering who I was at 2024. Something that proves I tried to notice things. A collection of small moments that together make a life.</p>
+<blockquote>The purpose of keeping a journal is not to remember the past. It's to understand the present.</blockquote>
+<p>Here we go, then. Let's see what there is to say.</p>`
+  }
+};
+
+// Cursor
+const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+if(dot){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  (function loop(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+}
+
+// Lenis
+const lenis=new Lenis({duration:1.3,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+gsap.ticker.add(t=>lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+
+// Nav
+const nav=document.getElementById('nav');let last=0;
+window.addEventListener('scroll',()=>{const y=window.scrollY;nav.style.transform=(y>last&&y>80)?'translateY(-140%)':'translateY(0)';last=y;},{passive:true});
+
+// Mobile menu
+const btn=document.getElementById('mbtn'),mmenu=document.getElementById('mmenu'),bar1=document.getElementById('mbar1'),bar2=document.getElementById('mbar2');
+let mopen=false;
+btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0';mmenu.style.pointerEvents=mopen?'auto':'none';bar1.style.transform=mopen?'translateY(3px) rotate(45deg)':'';bar2.style.transform=mopen?'translateY(-3px) rotate(-45deg)':'';});
+
+// Reveals
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
+gsap.from('.je',{opacity:0,x:-16,duration:.6,stagger:.08,ease:'power3.out',
+  scrollTrigger:{trigger:'main',start:'top 80%'}
+});
+
+// Modal
+const modal=document.getElementById('entry-modal');
+document.querySelectorAll('.je').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const key=el.dataset.entry;
+    const e=entries[key];
+    if(!e)return;
+    document.getElementById('modal-num').textContent=e.num;
+    document.getElementById('modal-title').textContent=e.title;
+    document.getElementById('modal-date').textContent=e.date;
+    document.getElementById('modal-tag').textContent=e.tag;
+    document.getElementById('modal-body').innerHTML=e.body;
+    modal.classList.add('open');
+    modal.scrollTop=0;
+    document.body.style.overflow='hidden';
+  });
+});
+document.getElementById('modal-close').addEventListener('click',()=>{
+  modal.classList.remove('open');
+  document.body.style.overflow='';
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open')){modal.classList.remove('open');document.body.style.overflow='';}});
+</script>
+</body>
+</html>

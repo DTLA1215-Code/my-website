@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Chen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { cream:'#FAF7F2', espresso:'#2D2926', warm:'#6B5E52', caramel:'#B5936B', sand:'#D4B896', mist:'#E8DDD3', surface:'#F2EBE2' },
+        fontFamily: { serif:['Playfair Display','serif'], sans:['Inter','sans-serif'], mono:['DM Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    html { scrollbar-width:none; }
+    html::-webkit-scrollbar { display:none; }
+    body::after {
+      content:''; position:fixed; inset:-50%; width:200%; height:200%;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.028; pointer-events:none; z-index:9998; animation:grain 6s steps(8) infinite;
+    }
+    @keyframes grain {
+      0%{transform:translate(0,0)} 12%{transform:translate(-4%,-10%)} 25%{transform:translate(-12%,5%)}
+      37%{transform:translate(6%,-20%)} 50%{transform:translate(-4%,22%)} 62%{transform:translate(-13%,8%)}
+      75%{transform:translate(13%,0%)} 87%{transform:translate(2%,14%)}
+    }
+    .cur { position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+    #cur-dot  { width:7px; height:7px; background:#B5936B; }
+    #cur-ring { width:38px; height:38px; border:1px solid #B5936B; opacity:.55; transition:width .3s,height .3s,opacity .3s,background .3s; }
+    body:has(a:hover) #cur-ring { width:56px;height:56px;opacity:.2;background:#B5936B; }
+    #nav { transition:transform .4s cubic-bezier(.25,.46,.45,.94); }
+    .ul-link { position:relative; }
+    .ul-link::after { content:''; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:#B5936B; transition:width .3s; }
+    .ul-link:hover::after { width:100%; }
+    .rv { overflow:hidden; }
+    .ri { will-change:transform; transform:translateY(110%); }
+
+    /* Photo strip hover */
+    .photo-strip { display:flex; gap:.75rem; }
+    .ps-item { flex:1; overflow:hidden; border-radius:2px; position:relative; }
+    .ps-item img { width:100%; height:200px; object-fit:cover; display:block; transition:transform .6s cubic-bezier(.25,.46,.45,.94); filter:saturate(.85); }
+    @media(min-width:768px){ .ps-item img { height:280px; } }
+    .ps-item:hover img { transform:scale(1.05); filter:saturate(1); }
+
+    /* Stat items */
+    .stat { border-top:1px solid #E8DDD3; padding-top:1.5rem; }
+
+    /* Gear list */
+    .gear-item { display:flex; justify-content:space-between; align-items:baseline; padding:.875rem 0; border-bottom:1px solid #E8DDD3; }
+  </style>
+</head>
+<body class="bg-cream font-sans text-espresso overflow-x-hidden">
+
+<div class="cur hidden md:block" id="cur-dot"></div>
+<div class="cur hidden md:block" id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav" class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3.5 rounded-full border border-mist bg-cream/75 backdrop-blur-md">
+  <a href="index.html" class="font-mono text-[11px] tracking-[.25em] text-espresso uppercase">Chen</a>
+  <div class="hidden md:flex items-center gap-7">
+    <a href="gallery.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Gallery</a>
+    <a href="videos.html"  class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Videos</a>
+    <a href="journal.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Journal</a>
+    <a href="about.html"   class="font-mono text-[10px] tracking-widest text-caramel uppercase ul-link">About</a>
+  </div>
+  <button id="mbtn" class="md:hidden flex flex-col gap-[5px] p-1" aria-label="Menu">
+    <span id="mbar1" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+    <span id="mbar2" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+  </button>
+</nav>
+<div id="mmenu" class="fixed inset-0 bg-cream z-40 flex flex-col items-center justify-center gap-10 opacity-0 pointer-events-none transition-opacity duration-300">
+  <a href="gallery.html" class="font-serif text-5xl text-espresso">Gallery</a>
+  <a href="videos.html"  class="font-serif text-5xl text-espresso">Videos</a>
+  <a href="journal.html" class="font-serif text-5xl text-espresso">Journal</a>
+  <a href="about.html"   class="font-serif text-5xl text-espresso">About</a>
+</div>
+
+<!-- HERO SECTION -->
+<section class="pt-36 pb-0 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
+    <div>
+      <div class="rv"><p class="ri font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-3">About</p></div>
+      <div class="rv"><h1 class="ri font-serif text-[clamp(3rem,7vw,5.5rem)] leading-tight text-espresso">Hello,<br>I'm Chen</h1></div>
+    </div>
+    <div class="rv pb-3 md:pb-6">
+      <p class="ri font-sans text-base text-warm leading-relaxed max-w-sm">
+        This is where I keep the small things. Photos taken without a plan, videos of nothing in particular, words written late at night. A record of a life, going.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- PORTRAIT + PHOTO STRIP -->
+<section class="px-6 md:px-14 mt-12 mb-20">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-8 items-start">
+      <!-- Portrait -->
+      <div class="about-reveal relative">
+        <div class="overflow-hidden rounded-sm">
+          <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=85" alt="Chen" class="w-full aspect-[3/4] object-cover">
+        </div>
+        <div class="absolute -bottom-4 -right-4 w-16 h-16 border border-caramel/20 rounded-sm -z-10 hidden md:block"></div>
+      </div>
+      <!-- Bio text -->
+      <div class="about-reveal space-y-6 pt-2 md:pt-8">
+        <p class="font-sans text-sm text-warm leading-relaxed">
+          I pick up a camera the way other people pick up a pen — not to create something, exactly, but to pay attention. To slow the day down just long enough to actually see it.
+        </p>
+        <p class="font-sans text-sm text-warm leading-relaxed">
+          This site started in late 2023 as a personal archive — somewhere to put the photos that never quite fit a social feed, the videos that were only ever meant for me, the journal entries that turned out to be worth keeping.
+        </p>
+        <p class="font-sans text-sm text-warm leading-relaxed">
+          I don't have a style, a theme, or a subject. I have a life that I'm trying to pay attention to. This is what that looks like.
+        </p>
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-6 pt-4">
+          <div class="stat">
+            <p class="font-serif text-3xl text-espresso mb-1">240+</p>
+            <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Photos</p>
+          </div>
+          <div class="stat">
+            <p class="font-serif text-3xl text-espresso mb-1">18</p>
+            <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Videos</p>
+          </div>
+          <div class="stat">
+            <p class="font-serif text-3xl text-espresso mb-1">5</p>
+            <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Entries</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO STRIP -->
+<section class="px-6 md:px-14 mb-24">
+  <div class="max-w-7xl mx-auto">
+    <div class="photo-strip about-reveal">
+      <div class="ps-item">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80" alt="Mountains" loading="lazy">
+      </div>
+      <div class="ps-item">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&q=80" alt="Forest" loading="lazy">
+      </div>
+      <div class="ps-item">
+        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&q=80" alt="Lake" loading="lazy">
+      </div>
+      <div class="ps-item hidden sm:block">
+        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&q=80" alt="Mist" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="w-full h-px bg-mist"></div>
+
+<!-- WHAT I USE -->
+<section class="py-20 px-6 md:px-14 bg-surface">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14">
+    <div class="about-reveal">
+      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-4">What I use</p>
+      <h2 class="font-serif text-3xl md:text-4xl text-espresso leading-tight mb-8">The gear<br><em>& tools</em></h2>
+      <div>
+        <div class="gear-item"><span class="font-sans text-sm text-espresso">Sony A7IV</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">Primary Camera</span></div>
+        <div class="gear-item"><span class="font-sans text-sm text-espresso">35mm f/1.8</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">Everyday Lens</span></div>
+        <div class="gear-item"><span class="font-sans text-sm text-espresso">iPhone 15 Pro</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">Always With Me</span></div>
+        <div class="gear-item"><span class="font-sans text-sm text-espresso">Lightroom Classic</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">Photo Edit</span></div>
+        <div class="gear-item"><span class="font-sans text-sm text-espresso">DaVinci Resolve</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">Video Edit</span></div>
+        <div class="gear-item border-0"><span class="font-sans text-sm text-espresso">Muji A5 Notebook</span><span class="font-mono text-[9px] text-warm uppercase tracking-wider">First Draft</span></div>
+      </div>
+    </div>
+
+    <div class="about-reveal">
+      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-4">Things I love</p>
+      <h2 class="font-serif text-3xl md:text-4xl text-espresso leading-tight mb-8">Current<br><em>obsessions</em></h2>
+      <div class="space-y-5">
+        <div>
+          <p class="font-sans text-sm text-espresso mb-1">Morning walks before the city wakes up</p>
+          <p class="font-mono text-[9px] text-warm tracking-wider uppercase">Ritual</p>
+        </div>
+        <div class="w-full h-px bg-mist"></div>
+        <div>
+          <p class="font-sans text-sm text-espresso mb-1">Film photography — the patience of it</p>
+          <p class="font-mono text-[9px] text-warm tracking-wider uppercase">Medium</p>
+        </div>
+        <div class="w-full h-px bg-mist"></div>
+        <div>
+          <p class="font-sans text-sm text-espresso mb-1">Reading in cafés with no plan to leave</p>
+          <p class="font-mono text-[9px] text-warm tracking-wider uppercase">Habit</p>
+        </div>
+        <div class="w-full h-px bg-mist"></div>
+        <div>
+          <p class="font-sans text-sm text-espresso mb-1">Cooking something new on Sundays</p>
+          <p class="font-mono text-[9px] text-warm tracking-wider uppercase">Weekend</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-24 px-6 md:px-14 text-center">
+  <div class="max-w-2xl mx-auto about-reveal">
+    <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-4">That's enough about me</p>
+    <h2 class="font-serif text-[clamp(2rem,5vw,3.5rem)] text-espresso leading-tight mb-8">Go see what<br><em>I've been up to</em></h2>
+    <div class="flex flex-wrap items-center justify-center gap-5">
+      <a href="gallery.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link hover:text-caramel transition-colors">Gallery →</a>
+      <span class="text-mist">·</span>
+      <a href="videos.html"  class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link hover:text-caramel transition-colors">Videos →</a>
+      <span class="text-mist">·</span>
+      <a href="journal.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link hover:text-caramel transition-colors">Journal →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-10 px-6 md:px-14 border-t border-mist">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+    <p class="font-mono text-[11px] tracking-[.3em] text-espresso uppercase">Chen</p>
+    <div class="flex items-center gap-7">
+      <a href="gallery.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Gallery</a>
+      <a href="videos.html"  class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Videos</a>
+      <a href="journal.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Journal</a>
+      <a href="about.html"   class="font-mono text-[9px] tracking-wider text-caramel uppercase">About</a>
+    </div>
+    <p class="font-mono text-[9px] text-warm/40 tracking-wider">© 2024 · All rights reserved</p>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+if(dot){document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});(function loop(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();}
+
+// Lenis
+const lenis=new Lenis({duration:1.3,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
+
+// Nav
+const nav=document.getElementById('nav');let last=0;
+window.addEventListener('scroll',()=>{const y=window.scrollY;nav.style.transform=(y>last&&y>80)?'translateY(-140%)':'translateY(0)';last=y;},{passive:true});
+
+// Mobile menu
+const btn=document.getElementById('mbtn'),mmenu=document.getElementById('mmenu'),bar1=document.getElementById('mbar1'),bar2=document.getElementById('mbar2');
+let mopen=false;
+btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0';mmenu.style.pointerEvents=mopen?'auto':'none';bar1.style.transform=mopen?'translateY(3px) rotate(45deg)':'';bar2.style.transform=mopen?'translateY(-3px) rotate(-45deg)':'';});
+
+// Animations
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
+gsap.from('.about-reveal',{opacity:0,y:28,duration:.9,stagger:.15,ease:'power3.out',
+  scrollTrigger:{trigger:'section',start:'top 82%',toggleActions:'play none none none'}
+});
+document.querySelectorAll('.about-reveal').forEach(el=>{
+  gsap.from(el,{opacity:0,y:24,duration:.85,ease:'power3.out',
+    scrollTrigger:{trigger:el,start:'top 85%'}
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery — Chen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { cream:'#FAF7F2', espresso:'#2D2926', warm:'#6B5E52', caramel:'#B5936B', sand:'#D4B896', mist:'#E8DDD3', surface:'#F2EBE2' },
+        fontFamily: { serif:['Playfair Display','serif'], sans:['Inter','sans-serif'], mono:['DM Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    html { scrollbar-width:none; }
+    html::-webkit-scrollbar { display:none; }
+    body::after {
+      content:''; position:fixed; inset:-50%; width:200%; height:200%;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.028; pointer-events:none; z-index:9998; animation:grain 6s steps(8) infinite;
+    }
+    @keyframes grain {
+      0%{transform:translate(0,0)} 12%{transform:translate(-4%,-10%)} 25%{transform:translate(-12%,5%)}
+      37%{transform:translate(6%,-20%)} 50%{transform:translate(-4%,22%)} 62%{transform:translate(-13%,8%)}
+      75%{transform:translate(13%,0%)} 87%{transform:translate(2%,14%)}
+    }
+    .cur { position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+    #cur-dot  { width:7px; height:7px; background:#B5936B; }
+    #cur-ring { width:38px; height:38px; border:1px solid #B5936B; opacity:.55; transition:width .3s,height .3s,opacity .3s,background .3s; }
+    body:has(a:hover) #cur-ring, body:has(button:hover) #cur-ring { width:56px;height:56px;opacity:.2;background:#B5936B; }
+    #nav { transition:transform .4s cubic-bezier(.25,.46,.45,.94); }
+    .ul-link { position:relative; }
+    .ul-link::after { content:''; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:#B5936B; transition:width .3s; }
+    .ul-link:hover::after { width:100%; }
+
+    /* Masonry */
+    .masonry { columns: 2; column-gap: 1rem; }
+    @media (min-width:768px) { .masonry { columns:3; column-gap:1.25rem; } }
+    @media (min-width:1280px) { .masonry { columns:4; column-gap:1.25rem; } }
+    .mitem { break-inside:avoid; margin-bottom:1rem; position:relative; overflow:hidden; border-radius:2px; cursor:pointer; }
+    @media (min-width:768px) { .mitem { margin-bottom:1.25rem; } }
+    .mitem img { width:100%; display:block; transition:transform .65s cubic-bezier(.25,.46,.45,.94); }
+    .mitem:hover img { transform:scale(1.05); }
+    .mitem .ov { position:absolute; inset:0; background:rgba(45,41,38,.42); opacity:0; transition:opacity .35s; display:flex; align-items:flex-end; padding:1.25rem; }
+    .mitem:hover .ov { opacity:1; }
+
+    /* Lightbox */
+    #lb { position:fixed; inset:0; z-index:9990; background:rgba(45,41,38,.95); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s; }
+    #lb.open { opacity:1; pointer-events:auto; }
+    #lb img { max-width:90vw; max-height:85vh; object-fit:contain; border-radius:2px; }
+    #lb-close { position:absolute; top:1.5rem; right:1.5rem; color:#D4B896; font-size:1.5rem; cursor:pointer; background:none; border:none; padding:.5rem; line-height:1; }
+    #lb-prev, #lb-next { position:absolute; top:50%; transform:translateY(-50%); color:#D4B896; background:none; border:none; font-size:1.5rem; cursor:pointer; padding:1rem; }
+    #lb-prev { left:1rem; } #lb-next { right:1rem; }
+    #lb-caption { position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); text-align:center; }
+
+    /* Filter tabs */
+    .ftab { transition:all .25s; }
+    .ftab.active { color:#B5936B; border-color:#B5936B; }
+
+    /* Page header */
+    .rv { overflow:hidden; }
+    .ri { will-change:transform; transform:translateY(110%); }
+  </style>
+</head>
+<body class="bg-cream font-sans text-espresso overflow-x-hidden">
+
+<!-- Cursors -->
+<div class="cur hidden md:block" id="cur-dot"></div>
+<div class="cur hidden md:block" id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav" class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3.5 rounded-full border border-mist bg-cream/75 backdrop-blur-md">
+  <a href="index.html" class="font-mono text-[11px] tracking-[.25em] text-espresso uppercase">Chen</a>
+  <div class="hidden md:flex items-center gap-7">
+    <a href="gallery.html" class="font-mono text-[10px] tracking-widest text-caramel uppercase ul-link">Gallery</a>
+    <a href="videos.html"  class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Videos</a>
+    <a href="journal.html" class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">Journal</a>
+    <a href="about.html"   class="font-mono text-[10px] tracking-widest text-warm uppercase ul-link">About</a>
+  </div>
+  <button id="mbtn" class="md:hidden flex flex-col gap-[5px] p-1" aria-label="Menu">
+    <span id="mbar1" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+    <span id="mbar2" class="block w-5 h-px bg-espresso transition-all duration-300"></span>
+  </button>
+</nav>
+<div id="mmenu" class="fixed inset-0 bg-cream z-40 flex flex-col items-center justify-center gap-10 opacity-0 pointer-events-none transition-opacity duration-300">
+  <a href="gallery.html" class="font-serif text-5xl text-espresso">Gallery</a>
+  <a href="videos.html"  class="font-serif text-5xl text-espresso">Videos</a>
+  <a href="journal.html" class="font-serif text-5xl text-espresso">Journal</a>
+  <a href="about.html"   class="font-serif text-5xl text-espresso">About</a>
+</div>
+
+<!-- PAGE HEADER -->
+<header class="pt-36 pb-16 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto">
+    <div class="rv"><p class="ri font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-3">Gallery</p></div>
+    <div class="rv"><h1 class="ri font-serif text-[clamp(3rem,8vw,6rem)] leading-tight text-espresso">Captured<br><em>Moments</em></h1></div>
+    <div class="rv mt-5"><p class="ri font-sans text-sm text-warm max-w-sm leading-relaxed">Every image is a pause in time — a small reminder of a day that mattered.</p></div>
+  </div>
+</header>
+
+<!-- FILTER TABS -->
+<div class="px-6 md:px-14 mb-10">
+  <div class="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
+    <button data-filter="all"    class="ftab active font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full hover:border-caramel hover:text-caramel transition-all duration-200">All</button>
+    <button data-filter="nature" class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Nature</button>
+    <button data-filter="urban"  class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Urban</button>
+    <button data-filter="people" class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">People</button>
+    <button data-filter="food"   class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Food</button>
+  </div>
+</div>
+
+<!-- MASONRY GRID -->
+<main class="px-6 md:px-14 pb-24">
+  <div class="max-w-7xl mx-auto">
+    <div class="masonry" id="grid">
+
+      <div class="mitem" data-cat="nature" data-title="Forest Morning" data-date="Jun 12, 2024"
+           data-src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80" alt="Forest Morning" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Jun 2024</p><p class="font-serif text-white text-base leading-tight">Forest Morning</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Golden Hour" data-date="May 28, 2024"
+           data-src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=600&q=80" alt="Golden Hour" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">May 2024</p><p class="font-serif text-white text-base leading-tight">Golden Hour</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Mountain Lake" data-date="Apr 15, 2024"
+           data-src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80" alt="Mountain Lake" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Apr 2024</p><p class="font-serif text-white text-base leading-tight">Mountain Lake</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Rolling Hills" data-date="Mar 3, 2024"
+           data-src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80" alt="Rolling Hills" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Mar 2024</p><p class="font-serif text-white text-base leading-tight">Rolling Hills</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="urban" data-title="City Lights" data-date="Feb 19, 2024"
+           data-src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80" alt="City Lights" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Feb 2024</p><p class="font-serif text-white text-base leading-tight">City Lights</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Misty Dawn" data-date="Feb 8, 2024"
+           data-src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80" alt="Misty Dawn" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Feb 2024</p><p class="font-serif text-white text-base leading-tight">Misty Dawn</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="food" data-title="Sunday Brunch" data-date="Jan 21, 2024"
+           data-src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Sunday Brunch" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Jan 2024</p><p class="font-serif text-white text-base leading-tight">Sunday Brunch</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Still Water" data-date="Jan 10, 2024"
+           data-src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=600&q=80" alt="Still Water" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Jan 2024</p><p class="font-serif text-white text-base leading-tight">Still Water</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="people" data-title="Afternoon Light" data-date="Dec 30, 2023"
+           data-src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80" alt="Afternoon Light" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Dec 2023</p><p class="font-serif text-white text-base leading-tight">Afternoon Light</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="urban" data-title="Empty Street" data-date="Dec 15, 2023"
+           data-src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&q=80" alt="Empty Street" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Dec 2023</p><p class="font-serif text-white text-base leading-tight">Empty Street</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="nature" data-title="Winter Trees" data-date="Dec 4, 2023"
+           data-src="https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=600&q=80" alt="Winter Trees" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Dec 2023</p><p class="font-serif text-white text-base leading-tight">Winter Trees</p></div></div>
+      </div>
+
+      <div class="mitem" data-cat="food" data-title="Morning Coffee" data-date="Nov 18, 2023"
+           data-src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=90">
+        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80" alt="Morning Coffee" loading="lazy">
+        <div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">Nov 2023</p><p class="font-serif text-white text-base leading-tight">Morning Coffee</p></div></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <button id="lb-close" aria-label="Close">✕</button>
+  <button id="lb-prev" aria-label="Previous">←</button>
+  <button id="lb-next" aria-label="Next">→</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-caption">
+    <p id="lb-title" class="font-serif text-white text-lg"></p>
+    <p id="lb-date"  class="font-mono text-[9px] text-sand/70 tracking-widest uppercase mt-1"></p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="py-10 px-6 md:px-14 border-t border-mist">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+    <p class="font-mono text-[11px] tracking-[.3em] text-espresso uppercase">Chen</p>
+    <div class="flex items-center gap-7">
+      <a href="gallery.html" class="font-mono text-[9px] tracking-wider text-caramel uppercase">Gallery</a>
+      <a href="videos.html"  class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Videos</a>
+      <a href="journal.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Journal</a>
+      <a href="about.html"   class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">About</a>
+    </div>
+    <p class="font-mono text-[9px] text-warm/40 tracking-wider">© 2024 · All rights reserved</p>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const dot = document.getElementById('cur-dot'), ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+if(dot){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  (function loop(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+}
+
+// Lenis
+const lenis=new Lenis({duration:1.3,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+lenis.on('scroll',ScrollTrigger.update);
+gsap.ticker.add(t=>lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+
+// Nav
+const nav=document.getElementById('nav');let last=0;
+window.addEventListener('scroll',()=>{const y=window.scrollY;nav.style.transform=(y>last&&y>80)?'translateY(-140%)':'translateY(0)';last=y;},{passive:true});
+
+// Mobile menu
+const btn=document.getElementById('mbtn'),menu=document.getElementById('mmenu'),bar1=document.getElementById('mbar1'),bar2=document.getElementById('mbar2');
+let open=false;
+btn.addEventListener('click',()=>{open=!open;menu.style.opacity=open?'1':'0';menu.style.pointerEvents=open?'auto':'none';bar1.style.transform=open?'translateY(3px) rotate(45deg)':'';bar2.style.transform=open?'translateY(-3px) rotate(-45deg)':'';});
+
+// Page header reveal
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
+
+// Masonry items animate in
+gsap.from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out',delay:.3});
+
+// Filter
+const tabs=document.querySelectorAll('.ftab');
+const items=document.querySelectorAll('.mitem');
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>{t.classList.remove('active');t.style.color='';t.style.borderColor='';});
+    tab.classList.add('active');
+    const f=tab.dataset.filter;
+    items.forEach(item=>{
+      const show=(f==='all'||item.dataset.cat===f);
+      gsap.to(item,{opacity:show?1:0.15,scale:show?1:.97,duration:.3,ease:'power2.out'});
+      item.style.pointerEvents=show?'auto':'none';
+    });
+  });
+});
+
+// Lightbox
+const lb=document.getElementById('lb');
+const lbImg=document.getElementById('lb-img');
+const lbTitle=document.getElementById('lb-title');
+const lbDate=document.getElementById('lb-date');
+let visible=[];let idx=0;
+
+function openLb(i){
+  idx=i;
+  const el=visible[i];
+  lbImg.src=el.dataset.src;
+  lbTitle.textContent=el.dataset.title;
+  lbDate.textContent=el.dataset.date;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLb(){lb.classList.remove('open');document.body.style.overflow='';}
+
+items.forEach(item=>{
+  item.addEventListener('click',()=>{
+    visible=Array.from(document.querySelectorAll('.mitem[style*="pointer-events: auto"],.mitem:not([style*="pointer-events"])'));
+    const i=visible.indexOf(item);
+    openLb(i>=0?i:0);
+  });
+});
+
+document.getElementById('lb-close').addEventListener('click',closeLb);
+document.getElementById('lb-prev').addEventListener('click',()=>{idx=(idx-1+visible.length)%visible.length;openLb(idx);});
+document.getElementById('lb-next').addEventListener('click',()=>{idx=(idx+1)%visible.length;openLb(idx);});
+document.addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return;if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft'){idx=(idx-1+visible.length)%visible.length;openLb(idx);}if(e.key==='ArrowRight'){idx=(idx+1)%visible.length;openLb(idx);}});
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb();});
+</script>
+</body>
+</html>

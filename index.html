@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recording Daily Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FAF7F2',
+            espresso: '#2D2926',
+            warm: '#6B5E52',
+            caramel: '#B5936B',
+            sand: '#D4B896',
+            mist: '#E8DDD3',
+            surface: '#F2EBE2',
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['DM Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* Film grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 9998;
+      animation: grain 6s steps(8) infinite;
+    }
+    @keyframes grain {
+      0%   { transform: translate(0,0); }
+      12%  { transform: translate(-4%,-10%); }
+      25%  { transform: translate(-12%, 5%); }
+      37%  { transform: translate( 6%,-20%); }
+      50%  { transform: translate(-4%, 22%); }
+      62%  { transform: translate(-13%, 8%); }
+      75%  { transform: translate(13%, 0%); }
+      87%  { transform: translate( 2%, 14%); }
+    }
+
+    /* Cursor */
+    @media (pointer:fine) { body, body * { cursor: none !important; } }
+    .cur { position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+    #cur-dot  { width:7px; height:7px; background:#B5936B; transition:width .25s,height .25s,opacity .25s; }
+    #cur-ring { width:38px; height:38px; border:1px solid #B5936B; opacity:.55; transition:width .3s,height .3s,opacity .3s,background .3s; }
+    body:has(a:hover) #cur-ring,
+    body:has(button:hover) #cur-ring { width:56px; height:56px; opacity:.2; background:#B5936B; }
+
+    /* Reveal wrapper */
+    .rv { overflow:hidden; }
+    .ri { will-change:transform; }
+
+
+    /* Gallery hover */
+    .gi { overflow:hidden; position:relative; }
+    .gi img { transition: transform .65s cubic-bezier(.25,.46,.45,.94); }
+    .gi:hover img { transform: scale(1.06); }
+    .gi .ov { opacity:0; transition: opacity .35s; }
+    .gi:hover .ov { opacity:1; }
+
+    /* Journal row */
+    .jr { border-bottom:1px solid #E8DDD3; transition:background .25s, padding-left .25s; }
+    .jr:hover { background:#F2EBE2; padding-left:1.5rem; }
+
+    /* Underline link */
+    .ul-link { position:relative; }
+    .ul-link::after { content:''; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:#B5936B; transition:width .3s; }
+    .ul-link:hover::after { width:100%; }
+
+    /* Loader */
+    #loader { position:fixed; inset:0; background:#FAF7F2; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .lb { width:180px; height:1px; background:#E8DDD3; position:relative; overflow:hidden; }
+    #lf { position:absolute; left:0; top:0; height:100%; background:#B5936B; width:0; transition:width .1s; }
+
+    /* Scrollable row */
+    .hscroll { overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .hscroll::-webkit-scrollbar { display:none; }
+
+    /* Mobile menu */
+    #mmenu { transition: opacity .3s, transform .3s; }
+  </style>
+</head>
+<body class="bg-cream font-sans text-espresso overflow-x-hidden">
+
+<!-- Loader -->
+<div id="loader">
+  <p class="font-mono text-[10px] tracking-[.35em] text-warm uppercase mb-5">Loading</p>
+  <div class="lb"><div id="lf"></div></div>
+</div>
+
+<!-- Cursors (desktop only) -->
+<div class="cur hidden md:block" id="cur-dot"></div>
+<div class="cur hidden md:block" id="cur-ring"></div>
+
+<!-- Hamburger button -->
+<button id="mbtn" class="fixed top-6 right-6 z-50 flex flex-col gap-[6px] p-3 rounded-sm hover:bg-espresso/5 transition-colors duration-200" aria-label="Menu">
+  <span id="mbar1" class="block w-[22px] bg-espresso transition-all duration-300 origin-center" style="height:1.5px"></span>
+  <span id="mbar2" class="block w-[22px] bg-espresso transition-all duration-300 origin-center" style="height:1.5px"></span>
+  <span id="mbar3" class="block w-[22px] bg-espresso transition-all duration-300 origin-center" style="height:1.5px"></span>
+</button>
+
+<!-- Full-screen menu overlay -->
+<div id="mmenu" class="fixed inset-0 bg-cream z-40 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none" style="transition: opacity .35s">
+  <a href="gallery.html" class="font-serif text-[clamp(2.5rem,6vw,5rem)] text-espresso hover:text-caramel transition-colors duration-200">Gallery</a>
+  <a href="videos.html"  class="font-serif text-[clamp(2.5rem,6vw,5rem)] text-espresso hover:text-caramel transition-colors duration-200">Videos</a>
+  <a href="journal.html" class="font-serif text-[clamp(2.5rem,6vw,5rem)] text-espresso hover:text-caramel transition-colors duration-200">Journal</a>
+  <a href="about.html"   class="font-serif text-[clamp(2.5rem,6vw,5rem)] text-espresso hover:text-caramel transition-colors duration-200">About</a>
+</div>
+
+<!-- ── HERO ────────────────────────────────────────────── -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Video background (replace src with your own video file path) -->
+  <div id="hbg" class="absolute z-0" style="inset:-40px; will-change:filter;">
+    <video id="hero-vid" autoplay muted loop playsinline
+           class="absolute inset-0 w-full h-full object-cover" style="opacity:.78">
+      <source src="assets/sea.mp4" type="video/mp4">
+    </video>
+  </div>
+  <!-- Gradient overlay: only bottom fades to cream for seamless transition -->
+  <div class="absolute inset-0 z-[1]" style="background: linear-gradient(to top, #FAF7F2 6%, rgba(250,247,242,0.6) 22%, transparent 42%)"></div>
+
+  <!-- Hero title: line 1 left, line 2 right -->
+  <div class="relative z-10 w-full px-8 md:px-14">
+    <div class="rv">
+      <div class="ri font-serif italic text-[clamp(1.5rem,3.8vw,4.2rem)] font-medium tracking-[.06em] leading-[1.15] text-left" style="color:rgba(45,41,38,0.72)">RECORDING DAILY LIFE</div>
+    </div>
+    <div class="rv">
+      <div class="ri font-serif italic text-[clamp(1.5rem,3.8vw,4.2rem)] font-normal tracking-[.06em] leading-[1.15] text-right" style="color:rgba(45,41,38,0.72)">REFLECTING ON THE PAST</div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 right-8 md:right-14 z-10 flex flex-col items-center gap-3">
+    <div id="sline" class="w-px h-14 bg-gradient-to-b from-transparent to-caramel"></div>
+    <p class="font-mono text-[9px] tracking-[.3em] text-caramel uppercase" style="writing-mode:vertical-rl">Scroll</p>
+  </div>
+</section>
+
+<!-- ── GALLERY PREVIEW ─────────────────────────────────── -->
+<section id="s-gallery" class="py-24 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">01 / Gallery</p>
+        <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Captured<br><em>Moments</em></h2>
+      </div>
+      <a href="gallery.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
+        <span>View All</span><span class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+
+    <!-- Horizontal scroll strip -->
+    <div class="hscroll -mx-6 md:-mx-14 px-6 md:px-14">
+      <div class="flex gap-4 pb-3 w-max">
+        <div class="gi rounded-sm flex-shrink-0 w-60 h-80 md:w-72 md:h-96">
+          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80" alt="Forest morning" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Jun 2024</p><p class="font-serif text-white text-lg leading-tight">Forest Morning</p></div>
+          </div>
+        </div>
+        <div class="gi rounded-sm flex-shrink-0 w-48 h-80 md:w-52 md:h-96 mt-10">
+          <img src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=600&q=80" alt="Golden hour" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">May 2024</p><p class="font-serif text-white text-lg leading-tight">Golden Hour</p></div>
+          </div>
+        </div>
+        <div class="gi rounded-sm flex-shrink-0 w-72 h-80 md:w-88 md:h-96">
+          <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80" alt="Mountain lake" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Apr 2024</p><p class="font-serif text-white text-lg leading-tight">Mountain Lake</p></div>
+          </div>
+        </div>
+        <div class="gi rounded-sm flex-shrink-0 w-52 h-80 md:w-60 md:h-96 mt-14">
+          <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80" alt="Rolling hills" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Mar 2024</p><p class="font-serif text-white text-lg leading-tight">Rolling Hills</p></div>
+          </div>
+        </div>
+        <div class="gi rounded-sm flex-shrink-0 w-64 h-80 md:w-72 md:h-96">
+          <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80" alt="Misty dawn" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Feb 2024</p><p class="font-serif text-white text-lg leading-tight">Misty Dawn</p></div>
+          </div>
+        </div>
+        <div class="gi rounded-sm flex-shrink-0 w-48 h-80 md:w-56 md:h-96 mt-6">
+          <img src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=600&q=80" alt="Still water" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Jan 2024</p><p class="font-serif text-white text-lg leading-tight">Still Water</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a href="gallery.html" class="md:hidden mt-6 inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
+      <span>View All Photos</span><span class="transition-transform group-hover:translate-x-1">→</span>
+    </a>
+  </div>
+</section>
+
+<div class="w-full h-px bg-mist"></div>
+
+<!-- ── VIDEOS PREVIEW ──────────────────────────────────── -->
+<section id="s-videos" class="py-24 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">02 / Videos</p>
+        <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Moving<br><em>Pictures</em></h2>
+      </div>
+      <a href="videos.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
+        <span>Watch All</span><span class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a href="videos.html" class="group">
+        <div class="gi rounded-sm aspect-video">
+          <img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&q=80" alt="Mountains" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">3:42 · Jun 2024</p>
+          <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">A weekend in the mountains</h3>
+        </div>
+      </a>
+      <a href="videos.html" class="group">
+        <div class="gi rounded-sm aspect-video">
+          <img src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80" alt="Morning" class="w-full h-full object-cover">
+          <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">5:18 · May 2024</p>
+          <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">Morning rituals, a short film</h3>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="w-full h-px bg-mist"></div>
+
+<!-- ── JOURNAL PREVIEW ─────────────────────────────────── -->
+<section id="s-journal" class="py-24 px-6 md:px-14">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">03 / Journal</p>
+        <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Written<br><em>Thoughts</em></h2>
+      </div>
+      <a href="journal.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
+        <span>Read All</span><span class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+
+    <div>
+      <a href="journal.html#e1" class="jr block py-7 px-4 -mx-4 rounded-sm group">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel">001</span>
+            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">The quiet between moments</h3>
+          </div>
+          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">June 12, 2024</span>
+        </div>
+        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          There's a certain stillness at the end of a long day — when the light turns gold and everything feels suspended in amber...
+        </p>
+      </a>
+      <a href="journal.html#e2" class="jr block py-7 px-4 -mx-4 rounded-sm group">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel">002</span>
+            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">On slowing down</h3>
+          </div>
+          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">May 28, 2024</span>
+        </div>
+        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          I used to think being productive meant always moving, always filling time. Lately I've started to see value in the pauses...
+        </p>
+      </a>
+      <a href="journal.html#e3" class="jr block py-7 px-4 -mx-4 rounded-sm group border-b border-mist">
+        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel">003</span>
+            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Small things that matter</h3>
+          </div>
+          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">April 15, 2024</span>
+        </div>
+        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
+          Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window...
+        </p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="w-full h-px bg-mist"></div>
+
+<!-- ── ABOUT PREVIEW ───────────────────────────────────── -->
+<section id="s-about" class="py-24 px-6 md:px-14 bg-surface">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
+    <div>
+      <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">04 / About</p>
+      <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso mb-6">The person<br><em>behind the lens</em></h2>
+      <p class="font-sans text-sm text-warm leading-relaxed mb-8 max-w-sm">
+        This is a space to slow down, look back, and remember. Every photo, video, and word is a small piece of a bigger story — still being written, one day at a time.
+      </p>
+      <a href="about.html" class="inline-flex items-center gap-3 font-mono text-[11px] tracking-widest text-caramel uppercase group">
+        <span>Learn More</span>
+        <span class="transition-transform group-hover:translate-x-2 duration-300">→</span>
+      </a>
+    </div>
+    <div class="relative">
+      <div class="gi rounded-sm overflow-hidden aspect-[4/5] max-w-sm mx-auto md:mx-0 md:ml-auto">
+        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=640&q=80" alt="Portrait" class="w-full h-full object-cover">
+      </div>
+      <div class="absolute -bottom-4 -left-4 w-20 h-20 border border-caramel/25 rounded-sm -z-10 hidden md:block"></div>
+      <div class="absolute -top-4 -right-4 w-12 h-12 border border-caramel/15 rounded-sm -z-10 hidden md:block"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<footer class="py-10 px-6 md:px-14 border-t border-mist">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+    <p class="font-mono text-[11px] tracking-[.3em] text-espresso uppercase">Chen</p>
+    <div class="flex items-center gap-7">
+      <a href="gallery.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Gallery</a>
+      <a href="videos.html"  class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Videos</a>
+      <a href="journal.html" class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">Journal</a>
+      <a href="about.html"   class="font-mono text-[9px] tracking-wider text-warm hover:text-caramel transition-colors uppercase">About</a>
+    </div>
+    <p class="font-mono text-[9px] text-warm/40 tracking-wider">© 2024 · All rights reserved</p>
+  </div>
+</footer>
+
+<script>
+// ── CURSOR (runs immediately, no GSAP dependency) ────────
+;(function() {
+  const dot  = document.getElementById('cur-dot');
+  const ring = document.getElementById('cur-ring');
+  if (!dot || !ring || !matchMedia('(pointer:fine)').matches) return;
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let rx = mx, ry = my;
+  dot.style.left  = mx + 'px'; dot.style.top  = my + 'px';
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  });
+  (function loop() {
+    rx += (mx - rx) * 0.11; ry += (my - ry) * 0.11;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ── MENU (runs immediately, no GSAP dependency) ─────────
+;(function() {
+  const btn  = document.getElementById('mbtn');
+  const menu = document.getElementById('mmenu');
+  const bar1 = document.getElementById('mbar1');
+  const bar2 = document.getElementById('mbar2');
+  const bar3 = document.getElementById('mbar3');
+  if (!btn || !menu) return;
+  let open = false;
+  btn.addEventListener('click', () => {
+    open = !open;
+    menu.style.opacity      = open ? '1' : '0';
+    menu.style.pointerEvents = open ? 'auto' : 'none';
+    bar1.style.transform    = open ? 'translateY(7.5px) rotate(45deg)' : '';
+    bar2.style.opacity      = open ? '0' : '1';
+    bar3.style.transform    = open ? 'translateY(-7.5px) rotate(-45deg)' : '';
+  });
+  // Close menu when clicking a link
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    open = false;
+    menu.style.opacity = '0';
+    menu.style.pointerEvents = 'none';
+    bar1.style.transform = '';
+    bar2.style.opacity   = '1';
+    bar3.style.transform = '';
+  }));
+})();
+
+// ── LOADER ──────────────────────────────────────────────
+const lf = document.getElementById('lf');
+const loader = document.getElementById('loader');
+let prog = 0;
+const iv = setInterval(() => {
+  prog += Math.random() * 18 + 4;
+  if (prog >= 100) { prog = 100; clearInterval(iv); setTimeout(boot, 200); }
+  lf.style.width = prog + '%';
+}, 80);
+
+function boot() {
+  gsap.to(loader, { opacity: 0, duration: 0.7, ease: 'power2.inOut', onComplete: () => {
+    loader.style.display = 'none';
+    initAll();
+  }});
+}
+
+// ── LENIS ───────────────────────────────────────────────
+let lenis;
+function initLenis() {
+  lenis = new Lenis({ duration: 1.3, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+  if (window.ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+// ── GSAP ANIMATIONS ─────────────────────────────────────
+function initAnims() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero blur on scroll — start clear, end at subtle 10px
+  gsap.set('#hbg', { filter: 'blur(0px)' });
+  gsap.to('#hbg', {
+    filter: 'blur(10px)',
+    ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
+  });
+
+  // Scroll line fade
+  gsap.to('#sline', {
+    scaleY: 0, transformOrigin: 'top',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: '25% top', scrub: true }
+  });
+
+  // Section labels + titles
+  document.querySelectorAll('.sl,.st').forEach(el => {
+    gsap.from(el, { opacity: 0, y: 28, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' }
+    });
+  });
+
+  // Gallery items
+  gsap.from('.gi', { opacity: 0, y: 24, duration: 0.7, stagger: 0.08, ease: 'power3.out',
+    scrollTrigger: { trigger: '#s-gallery', start: 'top 78%' }
+  });
+
+  // Journal rows
+  gsap.from('.jr', { opacity: 0, x: -16, duration: 0.6, stagger: 0.09, ease: 'power3.out',
+    scrollTrigger: { trigger: '#s-journal', start: 'top 75%' }
+  });
+
+  // Video cards
+  gsap.from('#s-videos .group', { opacity: 0, y: 24, duration: 0.8, stagger: 0.12, ease: 'power3.out',
+    scrollTrigger: { trigger: '#s-videos', start: 'top 75%' }
+  });
+
+  // About
+  gsap.from('#s-about > div > *', { opacity: 0, y: 30, duration: 0.9, stagger: 0.15, ease: 'power3.out',
+    scrollTrigger: { trigger: '#s-about', start: 'top 75%' }
+  });
+}
+
+
+// ── BOOT ────────────────────────────────────────────────
+function initAll() {
+  // Hero text reveal: GSAP core only, runs before optional libs
+  gsap.to('.ri', { y: 0, duration: 1.1, stagger: 0.1, ease: 'expo.out', delay: 0.05 });
+  try { initLenis(); } catch(e) {}
+  try { initAnims(); } catch(e) {}
+}
+
+// Set initial state immediately (before loader hides)
+document.querySelectorAll('.ri').forEach(el => el.style.transform = 'translateY(110%)');
+</script>
+</body>
+</html>
