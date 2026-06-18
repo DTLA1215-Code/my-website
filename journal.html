@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
@@ -101,110 +103,9 @@
 </header>
 
 <!-- ENTRIES LIST -->
-<main class="px-6 md:px-14 pb-24">
+<main id="journal-main" class="px-6 md:px-14 pb-24">
   <div class="max-w-7xl mx-auto">
-
-    <!-- Year divider -->
-    <div class="flex items-center gap-6 mb-6">
-      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase">2024</p>
-      <div class="flex-1 h-px bg-mist"></div>
-    </div>
-
-    <div class="space-y-0 mb-16">
-      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e1">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel/70">001</span>
-            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">The quiet between moments</h2>
-          </div>
-          <div class="flex items-center gap-4 ml-8 md:ml-0">
-            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Reflection</span>
-            <span class="font-mono text-[10px] text-warm tracking-wider">June 12</span>
-          </div>
-        </div>
-        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          There's a certain stillness at the end of a long day — when the light turns gold and everything feels suspended in amber...
-        </p>
-        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
-      </div>
-
-      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e2">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel/70">002</span>
-            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">On slowing down</h2>
-          </div>
-          <div class="flex items-center gap-4 ml-8 md:ml-0">
-            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Life</span>
-            <span class="font-mono text-[10px] text-warm tracking-wider">May 28</span>
-          </div>
-        </div>
-        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          I used to think being productive meant always moving, always filling time. Lately I've started to see value in the pauses...
-        </p>
-        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
-      </div>
-
-      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e3">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel/70">003</span>
-            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Small things that matter</h2>
-          </div>
-          <div class="flex items-center gap-4 ml-8 md:ml-0">
-            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Everyday</span>
-            <span class="font-mono text-[10px] text-warm tracking-wider">April 15</span>
-          </div>
-        </div>
-        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window...
-        </p>
-        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
-      </div>
-
-      <div class="je py-8 px-4 -mx-4 rounded-sm group border-b border-mist" data-entry="e4">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel/70">004</span>
-            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">A walk I'll remember</h2>
-          </div>
-          <div class="flex items-center gap-4 ml-8 md:ml-0">
-            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Travel</span>
-            <span class="font-mono text-[10px] text-warm tracking-wider">March 2</span>
-          </div>
-        </div>
-        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          I didn't plan it. I just started walking and kept going until the city dissolved into something quieter, something that felt like mine...
-        </p>
-        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
-      </div>
-    </div>
-
-    <!-- 2023 -->
-    <div class="flex items-center gap-6 mb-6">
-      <p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase">2023</p>
-      <div class="flex-1 h-px bg-mist"></div>
-    </div>
-
-    <div class="space-y-0">
-      <div class="je py-8 px-4 -mx-4 rounded-sm group" data-entry="e5">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel/70">005</span>
-            <h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Why I started this</h2>
-          </div>
-          <div class="flex items-center gap-4 ml-8 md:ml-0">
-            <span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">Meta</span>
-            <span class="font-mono text-[10px] text-warm tracking-wider">Dec 31</span>
-          </div>
-        </div>
-        <p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          Memory is unreliable. It softens things, sharpens others, erases entire months. I needed somewhere to keep the truth of days as they happened...
-        </p>
-        <p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>
-      </div>
-    </div>
-
+    <p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 text-center">Loading...</p>
   </div>
 </main>
 
@@ -245,50 +146,8 @@
 </footer>
 
 <script>
-const entries = {
-  e1: {
-    num:'001', title:'The quiet between moments', date:'June 12, 2024', tag:'Reflection',
-    body:`<p>There's a certain stillness at the end of a long day — when the light turns gold and everything feels suspended in amber. I've started to notice it more. The way the room shifts from afternoon into evening without asking permission.</p>
-<p>I was sitting by the window with a cup of tea that had gone cold when it occurred to me: most of life happens in the spaces between the things we think of as important. The drive home. The moment before sleep. The quiet Sunday mornings.</p>
-<blockquote>The most ordinary moments are the ones we forget first, and the ones we miss the most later.</blockquote>
-<p>I want to start paying more attention. Not in a forced, deliberate way — just... noticing. Letting things land. Letting the quiet be enough.</p>
-<h3>What I'm learning</h3>
-<p>Presence isn't a practice. It's a permission — to let go of what comes next, just for a little while, and to be exactly where you are.</p>`
-  },
-  e2: {
-    num:'002', title:'On slowing down', date:'May 28, 2024', tag:'Life',
-    body:`<p>I used to think that being productive meant always moving, always filling time. If I wasn't doing something, I was wasting something. It took a while — and some embarrassingly burnt-out months — to understand how wrong that was.</p>
-<p>Lately I've been walking more. Not to get anywhere in particular. Just walking. And I've started to notice things I never used to: the way shadows fall differently at different times of day, the sound a city makes when it's half-asleep.</p>
-<blockquote>Rest isn't the opposite of work. It's the thing that makes work possible.</blockquote>
-<p>I don't have any grand conclusions. I'm still learning how to slow down without feeling guilty about it. But I think that's the point — it's not a destination, it's just a different way of moving through time.</p>`
-  },
-  e3: {
-    num:'003', title:'Small things that matter', date:'April 15, 2024', tag:'Everyday',
-    body:`<p>Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window. My favourite playlist on a quiet commute. The satisfaction of finishing a chapter at just the right moment.</p>
-<p>None of these things are remarkable on their own. But together they make up something I'd call a good life — not in a grand, capital-G sense, but in the quiet, accumulated sense of days that felt worth living.</p>
-<h3>A small list</h3>
-<p>Things that made today okay: fresh air before 8am, a conversation that went somewhere unexpected, the way dinner smelled before I'd even tasted it, the moon being unexpectedly bright through the bedroom curtains.</p>
-<blockquote>Happiness, I think, is mostly a matter of noticing what's already there.</blockquote>
-<p>That's the practice, really. Not chasing more, but attending more closely to what's already here.</p>`
-  },
-  e4: {
-    num:'004', title:'A walk I\'ll remember', date:'March 2, 2024', tag:'Travel',
-    body:`<p>I didn't plan it. I just started walking and kept going until the city dissolved into something quieter, something that felt like mine.</p>
-<p>There was a point where I crossed a bridge and looked back and couldn't quite remember which direction I'd come from. It should have been unsettling. It wasn't. It felt like exactly the right kind of lost.</p>
-<p>I walked for about three hours total. Stopped at a bench near a small park I'd never noticed before — one of those in-between places that exists entirely for people who happen to need it. An old man was feeding pigeons with the serious concentration of someone doing something important. Maybe he was.</p>
-<blockquote>Sometimes the point of going out is not to arrive anywhere.</blockquote>
-<p>I came home tired and strangely settled. Took a long shower. Made eggs. The day felt finished in the best possible way — like something had actually happened, even if I couldn't quite explain what.</p>`
-  },
-  e5: {
-    num:'005', title:'Why I started this', date:'December 31, 2023', tag:'Meta',
-    body:`<p>Memory is unreliable. It softens things, sharpens others, erases entire months. I needed somewhere to keep the truth of days as they happened — not the highlight reel, not the performed version, just the actual texture of being alive.</p>
-<p>This is that place. It's not for anyone else, but it's not secret either. It's just... honest. A record. A way of saying: this happened, I was here, it mattered — or it didn't, but either way, I paid attention.</p>
-<h3>What I hope this becomes</h3>
-<p>Something to look back on when I'm older and wondering who I was at 2024. Something that proves I tried to notice things. A collection of small moments that together make a life.</p>
-<blockquote>The purpose of keeping a journal is not to remember the past. It's to understand the present.</blockquote>
-<p>Here we go, then. Let's see what there is to say.</p>`
-  }
-};
+firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
+const db=firebase.firestore();
 
 // Cursor
 const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
@@ -312,35 +171,69 @@ const btn=document.getElementById('mbtn'),mmenu=document.getElementById('mmenu')
 let mopen=false;
 btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0';mmenu.style.pointerEvents=mopen?'auto':'none';bar1.style.transform=mopen?'translateY(3px) rotate(45deg)':'';bar2.style.transform=mopen?'translateY(-3px) rotate(-45deg)':'';});
 
-// Reveals
 gsap.registerPlugin(ScrollTrigger);
 gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
-gsap.from('.je',{opacity:0,x:-16,duration:.6,stagger:.08,ease:'power3.out',
-  scrollTrigger:{trigger:'main',start:'top 80%'}
-});
 
 // Modal
 const modal=document.getElementById('entry-modal');
-document.querySelectorAll('.je').forEach(el=>{
-  el.addEventListener('click',()=>{
-    const key=el.dataset.entry;
-    const e=entries[key];
-    if(!e)return;
-    document.getElementById('modal-num').textContent=e.num;
-    document.getElementById('modal-title').textContent=e.title;
-    document.getElementById('modal-date').textContent=e.date;
-    document.getElementById('modal-tag').textContent=e.tag;
-    document.getElementById('modal-body').innerHTML=e.body;
-    modal.classList.add('open');
-    modal.scrollTop=0;
-    document.body.style.overflow='hidden';
-  });
-});
-document.getElementById('modal-close').addEventListener('click',()=>{
-  modal.classList.remove('open');
-  document.body.style.overflow='';
-});
+function openEntry(entry,numStr){
+  document.getElementById('modal-num').textContent=numStr||'';
+  document.getElementById('modal-title').textContent=entry.title||'';
+  document.getElementById('modal-date').textContent=entry.dateLabel||'';
+  document.getElementById('modal-tag').textContent=entry.tag||'';
+  const paras=(entry.content||'').split(/\n\n+/).filter(p=>p.trim());
+  document.getElementById('modal-body').innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
+  modal.classList.add('open');
+  modal.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+document.getElementById('modal-close').addEventListener('click',()=>{modal.classList.remove('open');document.body.style.overflow='';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open')){modal.classList.remove('open');document.body.style.overflow='';}});
+
+async function loadJournal(){
+  const main=document.getElementById('journal-main');
+  try{
+    const snap=await db.collection('journal').orderBy('timestamp','desc').get();
+    if(snap.empty){
+      main.innerHTML='<div class="max-w-7xl mx-auto py-20 text-center"><p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase">No entries yet</p></div>';
+      return;
+    }
+    // Group by year
+    const byYear={};
+    const total=snap.size;
+    snap.docs.forEach((doc,i)=>{
+      const d=doc.data();
+      const year=d.year||(d.timestamp?d.timestamp.toDate().getFullYear():new Date().getFullYear());
+      if(!byYear[year])byYear[year]=[];
+      byYear[year].push({...d,id:doc.id,numStr:String(total-i).padStart(3,'0')});
+    });
+    main.innerHTML='<div class="max-w-7xl mx-auto" id="journal-inner"></div>';
+    const inner=document.getElementById('journal-inner');
+    const years=Object.keys(byYear).sort((a,b)=>Number(b)-Number(a));
+    years.forEach(year=>{
+      const yearHdr=document.createElement('div');
+      yearHdr.className='flex items-center gap-6 mb-6';
+      yearHdr.innerHTML=`<p class="font-mono text-[10px] tracking-[.4em] text-caramel uppercase">${year}</p><div class="flex-1 h-px bg-mist"></div>`;
+      inner.appendChild(yearHdr);
+      const group=document.createElement('div');
+      group.className='space-y-0 mb-16';
+      byYear[year].forEach((entry,j)=>{
+        const isLast=j===byYear[year].length-1;
+        const preview=(entry.content||'').substring(0,140);
+        const el=document.createElement('div');
+        el.className='je py-8 px-4 -mx-4 rounded-sm group'+(isLast?' border-b border-mist':'');
+        el.innerHTML=`<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1"><div class="flex items-baseline gap-5"><span class="font-mono text-[10px] text-caramel/70">${entry.numStr}</span><h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${entry.title||''}</h2></div><div class="flex items-center gap-4 ml-8 md:ml-0"><span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">${entry.tag||''}</span><span class="font-mono text-[10px] text-warm tracking-wider">${entry.dateLabel||''}</span></div></div><p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length<(entry.content||'').length?'...':''}</p><p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry →</p>`;
+        el.addEventListener('click',()=>openEntry(entry,entry.numStr));
+        group.appendChild(el);
+      });
+      inner.appendChild(group);
+    });
+    gsap.from('.je',{opacity:0,x:-16,duration:.6,stagger:.08,ease:'power3.out',scrollTrigger:{trigger:'#journal-inner',start:'top 80%'}});
+  }catch(e){
+    main.innerHTML='<div class="max-w-7xl mx-auto py-20 text-center"><p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase">Unable to load entries</p></div>';
+  }
+}
+loadJournal();
 </script>
 </body>
 </html>
