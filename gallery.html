@@ -111,9 +111,9 @@
 <div class="px-6 md:px-14 mb-10">
   <div class="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
     <button data-filter="all"    class="ftab active font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full hover:border-caramel hover:text-caramel transition-all duration-200">All</button>
-    <button data-filter="nature" class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Nature</button>
-    <button data-filter="urban"  class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Urban</button>
-    <button data-filter="people" class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">People</button>
+    <button data-filter="travel" class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Travel</button>
+    <button data-filter="life"   class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Life</button>
+    <button data-filter="other"  class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Other</button>
     <button data-filter="food"   class="ftab font-mono text-[9px] tracking-widest uppercase px-4 py-2 border border-mist rounded-full text-warm hover:border-caramel hover:text-caramel transition-all duration-200">Food</button>
   </div>
 </div>
@@ -206,6 +206,8 @@ function attachItems(){
   gsap.from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out'});
 }
 
+function cloudinaryThumb(url,w=900){return url.replace('/upload/',`/upload/w_${w},c_limit,q_auto,f_auto/`);}
+
 async function loadGallery(){
   const grid=document.getElementById('grid');
   try{
@@ -223,7 +225,7 @@ async function loadGallery(){
       el.dataset.title=d.caption||'';
       el.dataset.date=d.dateLabel||'';
       el.dataset.src=d.url;
-      el.innerHTML=`<img src="${d.url}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
+      el.innerHTML=`<img src="${cloudinaryThumb(d.url)}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
       grid.appendChild(el);
     });
     attachItems();
