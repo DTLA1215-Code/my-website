@@ -206,7 +206,7 @@ function attachItems(){
   gsap.from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out'});
 }
 
-function cloudinaryThumb(url,w=900){return url.replace('/upload/',`/upload/w_${w},c_limit,q_auto,f_auto/`);}
+function cloudinaryThumb(url,w=1400){return url.replace('/upload/',`/upload/w_${w},c_limit,q_90,e_sharpen:80/`);}
 
 async function loadGallery(){
   const grid=document.getElementById('grid');
