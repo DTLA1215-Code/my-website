@@ -48,7 +48,7 @@
     @media (min-width:1280px) { .masonry { columns:4; column-gap:1.25rem; } }
     .mitem { break-inside:avoid; margin-bottom:1rem; position:relative; overflow:hidden; border-radius:2px; cursor:pointer; }
     @media (min-width:768px) { .mitem { margin-bottom:1.25rem; } }
-    .mitem img { width:100%; display:block; transition:transform .65s cubic-bezier(.25,.46,.45,.94); }
+    .mitem img { width:100%; display:block; transition:transform .65s cubic-bezier(.25,.46,.45,.94); filter:contrast(1.12) saturate(1.18); }
     .mitem:hover img { transform:scale(1.05); }
     .mitem .ov { position:absolute; inset:0; background:rgba(45,41,38,.42); opacity:0; transition:opacity .35s; display:flex; align-items:flex-end; padding:1.25rem; }
     .mitem:hover .ov { opacity:1; }
@@ -206,7 +206,7 @@ function attachItems(){
   gsap.from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out'});
 }
 
-function cloudinaryThumb(url,w=1400){return url.replace('/upload/',`/upload/w_${w},c_limit,q_90,e_sharpen:80/`);}
+function cloudinaryThumb(url,w=1400){return url.replace('/upload/',`/upload/w_${w},c_limit,q_95,e_improve/`);}
 
 async function loadGallery(){
   const grid=document.getElementById('grid');
