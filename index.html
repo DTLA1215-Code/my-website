@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -167,7 +167,7 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Captured<br><em>Moments</em></h2>
       </div>
       <a href="gallery.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>View All</span><span class="transition-transform group-hover:translate-x-1">â†’</span>
+        <span>View All</span><span class="transition-transform group-hover:translate-x-1">â†?/span>
       </a>
     </div>
 
@@ -214,7 +214,7 @@
     </div>
 
     <a href="gallery.html" class="md:hidden mt-6 inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-      <span>View All Photos</span><span class="transition-transform group-hover:translate-x-1">â†’</span>
+      <span>View All Photos</span><span class="transition-transform group-hover:translate-x-1">â†?/span>
     </a>
   </div>
 </section>
@@ -230,7 +230,7 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Moving<br><em>Pictures</em></h2>
       </div>
       <a href="videos.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>Watch All</span><span class="transition-transform group-hover:translate-x-1">â†’</span>
+        <span>Watch All</span><span class="transition-transform group-hover:translate-x-1">â†?/span>
       </a>
     </div>
 
@@ -278,7 +278,7 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Written<br><em>Thoughts</em></h2>
       </div>
       <a href="journal.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>Read All</span><span class="transition-transform group-hover:translate-x-1">â†’</span>
+        <span>Read All</span><span class="transition-transform group-hover:translate-x-1">â†?/span>
       </a>
     </div>
 
@@ -292,7 +292,7 @@
           <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">June 12, 2024</span>
         </div>
         <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          There's a certain stillness at the end of a long day â€” when the light turns gold and everything feels suspended in amber...
+          There's a certain stillness at the end of a long day â€?when the light turns gold and everything feels suspended in amber...
         </p>
       </a>
       <a href="journal.html#e2" class="jr block py-7 px-4 -mx-4 rounded-sm group">
@@ -332,11 +332,11 @@
       <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">04 / About</p>
       <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso mb-6">The person<br><em>behind the lens</em></h2>
       <p class="font-sans text-sm text-warm leading-relaxed mb-8 max-w-sm">
-        This is a space to slow down, look back, and remember. Every photo, video, and word is a small piece of a bigger story â€” still being written, one day at a time.
+        This is a space to slow down, look back, and remember. Every photo, video, and word is a small piece of a bigger story â€?still being written, one day at a time.
       </p>
       <a href="about.html" class="inline-flex items-center gap-3 font-mono text-[11px] tracking-widest text-caramel uppercase group">
         <span>Learn More</span>
-        <span class="transition-transform group-hover:translate-x-2 duration-300">â†’</span>
+        <span class="transition-transform group-hover:translate-x-2 duration-300">â†?/span>
       </a>
     </div>
     <div class="relative">
@@ -442,7 +442,7 @@ function initLenis() {
 function initAnims() {
   gsap.registerPlugin(ScrollTrigger);
 
-  // Hero blur on scroll â€” start clear, end at subtle 10px
+  // Hero blur on scroll â€?start clear, end at subtle 10px
   gsap.set('#hbg', { filter: 'blur(0px)' });
   gsap.to('#hbg', {
     filter: 'blur(10px)',
