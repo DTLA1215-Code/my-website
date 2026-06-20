@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -72,7 +74,6 @@
     .rv { overflow:hidden; }
     .ri { will-change:transform; }
 
-
     /* Gallery hover */
     .gi { overflow:hidden; position:relative; }
     .gi img { transition: transform .65s cubic-bezier(.25,.46,.45,.94); }
@@ -129,19 +130,15 @@
   <a href="about.html"   class="font-serif text-[clamp(2.5rem,6vw,5rem)] text-espresso hover:text-caramel transition-colors duration-200">About</a>
 </div>
 
-<!-- ── HERO ────────────────────────────────────────────── -->
+<!-- HERO -->
 <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
-  <!-- Video background (replace src with your own video file path) -->
   <div id="hbg" class="absolute z-0" style="inset:-40px; will-change:filter;">
     <video id="hero-vid" autoplay muted loop playsinline
            class="absolute inset-0 w-full h-full object-cover" style="opacity:.78">
       <source src="assets/sea.mp4" type="video/mp4">
     </video>
   </div>
-  <!-- Gradient overlay: only bottom fades to cream for seamless transition -->
   <div class="absolute inset-0 z-[1]" style="background: linear-gradient(to top, #FAF7F2 6%, rgba(250,247,242,0.6) 22%, transparent 42%)"></div>
-
-  <!-- Hero title: line 1 left, line 2 right -->
   <div class="relative z-10 w-full px-8 md:px-14">
     <div class="rv">
       <div class="ri font-serif italic text-[clamp(1.5rem,3.8vw,4.2rem)] font-medium tracking-[.06em] leading-[1.15] text-left" style="color:rgba(45,41,38,0.72)">RECORDING DAILY LIFE</div>
@@ -150,15 +147,13 @@
       <div class="ri font-serif italic text-[clamp(1.5rem,3.8vw,4.2rem)] font-normal tracking-[.06em] leading-[1.15] text-right" style="color:rgba(45,41,38,0.72)">REFLECTING ON THE PAST</div>
     </div>
   </div>
-
-  <!-- Scroll indicator -->
   <div class="absolute bottom-8 right-8 md:right-14 z-10 flex flex-col items-center gap-3">
     <div id="sline" class="w-px h-14 bg-gradient-to-b from-transparent to-caramel"></div>
     <p class="font-mono text-[9px] tracking-[.3em] text-caramel uppercase" style="writing-mode:vertical-rl">Scroll</p>
   </div>
 </section>
 
-<!-- ── GALLERY PREVIEW ─────────────────────────────────── -->
+<!-- GALLERY PREVIEW -->
 <section id="s-gallery" class="py-24 px-6 md:px-14">
   <div class="max-w-7xl mx-auto">
     <div class="flex items-end justify-between mb-10">
@@ -167,61 +162,23 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Captured<br><em>Moments</em></h2>
       </div>
       <a href="gallery.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>View All</span><span class="transition-transform group-hover:translate-x-1">�?/span>
+        <span>View All</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
       </a>
     </div>
-
-    <!-- Horizontal scroll strip -->
     <div class="hscroll -mx-6 md:-mx-14 px-6 md:px-14">
-      <div class="flex gap-4 pb-3 w-max">
-        <div class="gi rounded-sm flex-shrink-0 w-60 h-80 md:w-72 md:h-96">
-          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80" alt="Forest morning" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Jun 2024</p><p class="font-serif text-white text-lg leading-tight">Forest Morning</p></div>
-          </div>
-        </div>
-        <div class="gi rounded-sm flex-shrink-0 w-48 h-80 md:w-52 md:h-96 mt-10">
-          <img src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=600&q=80" alt="Golden hour" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">May 2024</p><p class="font-serif text-white text-lg leading-tight">Golden Hour</p></div>
-          </div>
-        </div>
-        <div class="gi rounded-sm flex-shrink-0 w-72 h-80 md:w-88 md:h-96">
-          <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80" alt="Mountain lake" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Apr 2024</p><p class="font-serif text-white text-lg leading-tight">Mountain Lake</p></div>
-          </div>
-        </div>
-        <div class="gi rounded-sm flex-shrink-0 w-52 h-80 md:w-60 md:h-96 mt-14">
-          <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80" alt="Rolling hills" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Mar 2024</p><p class="font-serif text-white text-lg leading-tight">Rolling Hills</p></div>
-          </div>
-        </div>
-        <div class="gi rounded-sm flex-shrink-0 w-64 h-80 md:w-72 md:h-96">
-          <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80" alt="Misty dawn" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Feb 2024</p><p class="font-serif text-white text-lg leading-tight">Misty Dawn</p></div>
-          </div>
-        </div>
-        <div class="gi rounded-sm flex-shrink-0 w-48 h-80 md:w-56 md:h-96 mt-6">
-          <img src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=600&q=80" alt="Still water" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
-            <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">Jan 2024</p><p class="font-serif text-white text-lg leading-tight">Still Water</p></div>
-          </div>
-        </div>
+      <div id="gallery-strip" class="flex gap-4 pb-3 w-max items-end">
+        <p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 px-8">Loading...</p>
       </div>
     </div>
-
     <a href="gallery.html" class="md:hidden mt-6 inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-      <span>View All Photos</span><span class="transition-transform group-hover:translate-x-1">�?/span>
+      <span>View All Photos</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
     </a>
   </div>
 </section>
 
 <div class="w-full h-px bg-mist"></div>
 
-<!-- ── VIDEOS PREVIEW ──────────────────────────────────── -->
+<!-- VIDEOS PREVIEW -->
 <section id="s-videos" class="py-24 px-6 md:px-14">
   <div class="max-w-7xl mx-auto">
     <div class="flex items-end justify-between mb-10">
@@ -230,46 +187,18 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Moving<br><em>Pictures</em></h2>
       </div>
       <a href="videos.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>Watch All</span><span class="transition-transform group-hover:translate-x-1">�?/span>
+        <span>Watch All</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
       </a>
     </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <a href="videos.html" class="group">
-        <div class="gi rounded-sm aspect-video">
-          <img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&q=80" alt="Mountains" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
-            <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">3:42 · Jun 2024</p>
-          <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">A weekend in the mountains</h3>
-        </div>
-      </a>
-      <a href="videos.html" class="group">
-        <div class="gi rounded-sm aspect-video">
-          <img src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80" alt="Morning" class="w-full h-full object-cover">
-          <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
-            <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">5:18 · May 2024</p>
-          <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">Morning rituals, a short film</h3>
-        </div>
-      </a>
+    <div id="videos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Loading...</p>
     </div>
   </div>
 </section>
 
 <div class="w-full h-px bg-mist"></div>
 
-<!-- ── JOURNAL PREVIEW ─────────────────────────────────── -->
+<!-- JOURNAL PREVIEW -->
 <section id="s-journal" class="py-24 px-6 md:px-14">
   <div class="max-w-7xl mx-auto">
     <div class="flex items-end justify-between mb-10">
@@ -278,65 +207,29 @@
         <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso">Written<br><em>Thoughts</em></h2>
       </div>
       <a href="journal.html" class="hidden md:inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-warm uppercase ul-link group">
-        <span>Read All</span><span class="transition-transform group-hover:translate-x-1">�?/span>
+        <span>Read All</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
       </a>
     </div>
-
-    <div>
-      <a href="journal.html#e1" class="jr block py-7 px-4 -mx-4 rounded-sm group">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel">001</span>
-            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">The quiet between moments</h3>
-          </div>
-          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">June 12, 2024</span>
-        </div>
-        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          There's a certain stillness at the end of a long day �?when the light turns gold and everything feels suspended in amber...
-        </p>
-      </a>
-      <a href="journal.html#e2" class="jr block py-7 px-4 -mx-4 rounded-sm group">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel">002</span>
-            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">On slowing down</h3>
-          </div>
-          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">May 28, 2024</span>
-        </div>
-        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          I used to think being productive meant always moving, always filling time. Lately I've started to see value in the pauses...
-        </p>
-      </a>
-      <a href="journal.html#e3" class="jr block py-7 px-4 -mx-4 rounded-sm group border-b border-mist">
-        <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <div class="flex items-baseline gap-5">
-            <span class="font-mono text-[10px] text-caramel">003</span>
-            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">Small things that matter</h3>
-          </div>
-          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">April 15, 2024</span>
-        </div>
-        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">
-          Morning light on the table. Tea at exactly the right temperature. The sound of rain against the window...
-        </p>
-      </a>
+    <div id="journal-list">
+      <p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Loading...</p>
     </div>
   </div>
 </section>
 
 <div class="w-full h-px bg-mist"></div>
 
-<!-- ── ABOUT PREVIEW ───────────────────────────────────── -->
+<!-- ABOUT PREVIEW -->
 <section id="s-about" class="py-24 px-6 md:px-14 bg-surface">
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
     <div>
       <p class="sl font-mono text-[10px] tracking-[.4em] text-caramel uppercase mb-2">04 / About</p>
       <h2 class="st font-serif text-[clamp(2rem,5vw,3.75rem)] leading-tight text-espresso mb-6">The person<br><em>behind the lens</em></h2>
       <p class="font-sans text-sm text-warm leading-relaxed mb-8 max-w-sm">
-        This is a space to slow down, look back, and remember. Every photo, video, and word is a small piece of a bigger story �?still being written, one day at a time.
+        This is a space to slow down, look back, and remember. Every photo, video, and word is a small piece of a bigger story — still being written, one day at a time.
       </p>
       <a href="about.html" class="inline-flex items-center gap-3 font-mono text-[11px] tracking-widest text-caramel uppercase group">
         <span>Learn More</span>
-        <span class="transition-transform group-hover:translate-x-2 duration-300">�?/span>
+        <span class="transition-transform group-hover:translate-x-2 duration-300">&rarr;</span>
       </a>
     </div>
     <div class="relative">
@@ -349,7 +242,7 @@
   </div>
 </section>
 
-<!-- ── FOOTER ──────────────────────────────────────────── -->
+<!-- FOOTER -->
 <footer class="py-10 px-6 md:px-14 border-t border-mist">
   <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
     <p class="font-mono text-[11px] tracking-[.3em] text-espresso uppercase">Chen</p>
@@ -364,7 +257,14 @@
 </footer>
 
 <script>
-// ── CURSOR (runs immediately, no GSAP dependency) ────────
+// Firebase
+firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
+const db = firebase.firestore();
+
+function imgThumb(url, w=600) { return url.replace('/upload/', `/upload/w_${w},c_limit,q_95/`); }
+function vidThumb(url) { return url.replace('/video/upload/','/video/upload/so_0,w_700,q_80/').replace(/\.(mp4|mov|avi|webm|mkv)$/i,'.jpg'); }
+
+// CURSOR
 ;(function() {
   const dot  = document.getElementById('cur-dot');
   const ring = document.getElementById('cur-ring');
@@ -384,7 +284,7 @@
   })();
 })();
 
-// ── MENU (runs immediately, no GSAP dependency) ─────────
+// MENU
 ;(function() {
   const btn  = document.getElementById('mbtn');
   const menu = document.getElementById('mmenu');
@@ -395,13 +295,12 @@
   let open = false;
   btn.addEventListener('click', () => {
     open = !open;
-    menu.style.opacity      = open ? '1' : '0';
+    menu.style.opacity       = open ? '1' : '0';
     menu.style.pointerEvents = open ? 'auto' : 'none';
-    bar1.style.transform    = open ? 'translateY(7.5px) rotate(45deg)' : '';
-    bar2.style.opacity      = open ? '0' : '1';
-    bar3.style.transform    = open ? 'translateY(-7.5px) rotate(-45deg)' : '';
+    bar1.style.transform     = open ? 'translateY(7.5px) rotate(45deg)' : '';
+    bar2.style.opacity       = open ? '0' : '1';
+    bar3.style.transform     = open ? 'translateY(-7.5px) rotate(-45deg)' : '';
   });
-  // Close menu when clicking a link
   menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
     open = false;
     menu.style.opacity = '0';
@@ -412,7 +311,7 @@
   }));
 })();
 
-// ── LOADER ──────────────────────────────────────────────
+// LOADER
 const lf = document.getElementById('lf');
 const loader = document.getElementById('loader');
 let prog = 0;
@@ -429,7 +328,7 @@ function boot() {
   }});
 }
 
-// ── LENIS ───────────────────────────────────────────────
+// LENIS
 let lenis;
 function initLenis() {
   lenis = new Lenis({ duration: 1.3, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
@@ -438,62 +337,152 @@ function initLenis() {
   gsap.ticker.lagSmoothing(0);
 }
 
-// ── GSAP ANIMATIONS ─────────────────────────────────────
+// GSAP ANIMATIONS
 function initAnims() {
   gsap.registerPlugin(ScrollTrigger);
 
-  // Hero blur on scroll �?start clear, end at subtle 10px
   gsap.set('#hbg', { filter: 'blur(0px)' });
   gsap.to('#hbg', {
-    filter: 'blur(10px)',
-    ease: 'none',
+    filter: 'blur(10px)', ease: 'none',
     scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
   });
 
-  // Scroll line fade
   gsap.to('#sline', {
     scaleY: 0, transformOrigin: 'top',
     scrollTrigger: { trigger: '#hero', start: 'top top', end: '25% top', scrub: true }
   });
 
-  // Section labels + titles
   document.querySelectorAll('.sl,.st').forEach(el => {
     gsap.from(el, { opacity: 0, y: 28, duration: 0.9, ease: 'power3.out',
       scrollTrigger: { trigger: el, start: 'top 88%' }
     });
   });
 
-  // Gallery items
   gsap.from('.gi', { opacity: 0, y: 24, duration: 0.7, stagger: 0.08, ease: 'power3.out',
     scrollTrigger: { trigger: '#s-gallery', start: 'top 78%' }
   });
 
-  // Journal rows
   gsap.from('.jr', { opacity: 0, x: -16, duration: 0.6, stagger: 0.09, ease: 'power3.out',
     scrollTrigger: { trigger: '#s-journal', start: 'top 75%' }
   });
 
-  // Video cards
-  gsap.from('#s-videos .group', { opacity: 0, y: 24, duration: 0.8, stagger: 0.12, ease: 'power3.out',
+  gsap.from('#s-videos .vcard-home', { opacity: 0, y: 24, duration: 0.8, stagger: 0.12, ease: 'power3.out',
     scrollTrigger: { trigger: '#s-videos', start: 'top 75%' }
   });
 
-  // About
   gsap.from('#s-about > div > *', { opacity: 0, y: 30, duration: 0.9, stagger: 0.15, ease: 'power3.out',
     scrollTrigger: { trigger: '#s-about', start: 'top 75%' }
   });
 }
 
+// LOAD GALLERY PREVIEW
+async function loadGalleryPreview() {
+  const strip = document.getElementById('gallery-strip');
+  const widths  = ['w-60 md:w-72','w-48 md:w-52','w-72 md:w-80','w-52 md:w-60','w-64 md:w-72','w-48 md:w-56'];
+  const heights = ['h-80 md:h-96','h-80 md:h-96','h-80 md:h-96','h-80 md:h-96','h-80 md:h-96','h-80 md:h-96'];
+  const offsets = [0, 40, 0, 56, 0, 24];
+  try {
+    const snap = await db.collection('gallery').orderBy('timestamp','desc').limit(6).get();
+    if (snap.empty) {
+      strip.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 px-8">No photos yet</p>';
+      return;
+    }
+    strip.innerHTML = '';
+    snap.docs.forEach((doc, i) => {
+      const d = doc.data();
+      const idx = i % widths.length;
+      const el = document.createElement('a');
+      el.href = 'gallery.html';
+      el.className = `gi rounded-sm flex-shrink-0 ${widths[idx]} ${heights[idx]}`;
+      el.style.marginTop = offsets[idx] + 'px';
+      el.innerHTML = `<img src="${imgThumb(d.url)}" alt="${d.caption||''}" class="w-full h-full object-cover" loading="lazy">
+        <div class="ov absolute inset-0 bg-espresso/45 flex items-end p-5">
+          <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-lg leading-tight">${d.caption||''}</p></div>
+        </div>`;
+      strip.appendChild(el);
+    });
+  } catch(e) {
+    strip.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 px-8">Unable to load</p>';
+  }
+}
 
-// ── BOOT ────────────────────────────────────────────────
+// LOAD VIDEOS PREVIEW
+async function loadVideosPreview() {
+  const grid = document.getElementById('videos-grid');
+  try {
+    const snap = await db.collection('videos').orderBy('timestamp','desc').limit(2).get();
+    if (snap.empty) {
+      grid.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">No videos yet</p>';
+      return;
+    }
+    grid.innerHTML = '';
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      const thumb = d.thumbnail || vidThumb(d.url);
+      const el = document.createElement('a');
+      el.href = 'videos.html';
+      el.className = 'group vcard-home';
+      el.innerHTML = `<div class="gi rounded-sm aspect-video">
+          <img src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" loading="lazy">
+          <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">${d.duration?d.duration+' &middot; ':''}${d.dateLabel||''}</p>
+          <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">${d.title||''}</h3>
+        </div>`;
+      grid.appendChild(el);
+    });
+  } catch(e) {
+    grid.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Unable to load</p>';
+  }
+}
+
+// LOAD JOURNAL PREVIEW
+async function loadJournalPreview() {
+  const list = document.getElementById('journal-list');
+  try {
+    const snap = await db.collection('journal').orderBy('timestamp','desc').limit(3).get();
+    if (snap.empty) {
+      list.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">No entries yet</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snap.docs.forEach((doc, i) => {
+      const d = doc.data();
+      const preview = (d.content||'').substring(0, 120);
+      const isLast = i === snap.docs.length - 1;
+      const el = document.createElement('a');
+      el.href = 'journal.html';
+      el.className = 'jr block py-7 px-4 -mx-4 rounded-sm group' + (isLast ? ' border-b border-mist' : '');
+      el.innerHTML = `<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <div class="flex items-baseline gap-5">
+            <span class="font-mono text-[10px] text-caramel">${String(i+1).padStart(3,'0')}</span>
+            <h3 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${d.title||''}</h3>
+          </div>
+          <span class="font-mono text-[10px] text-warm tracking-wider ml-8 md:ml-0">${d.dateLabel||''}</span>
+        </div>
+        <p class="mt-2.5 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length < (d.content||'').length ? '...' : ''}</p>`;
+      list.appendChild(el);
+    });
+  } catch(e) {
+    list.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Unable to load</p>';
+  }
+}
+
+// BOOT
 function initAll() {
-  // Hero text reveal: GSAP core only, runs before optional libs
   gsap.to('.ri', { y: 0, duration: 1.1, stagger: 0.1, ease: 'expo.out', delay: 0.05 });
   try { initLenis(); } catch(e) {}
   try { initAnims(); } catch(e) {}
+  loadGalleryPreview();
+  loadVideosPreview();
+  loadJournalPreview();
 }
 
-// Set initial state immediately (before loader hides)
 document.querySelectorAll('.ri').forEach(el => el.style.transform = 'translateY(110%)');
 </script>
 </body>
