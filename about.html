@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
@@ -121,15 +123,15 @@
         <!-- Stats -->
         <div class="grid grid-cols-3 gap-6 pt-4">
           <div class="stat">
-            <p class="font-serif text-3xl text-espresso mb-1">240+</p>
+            <p id="stat-photos" class="font-serif text-3xl text-espresso mb-1">—</p>
             <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Photos</p>
           </div>
           <div class="stat">
-            <p class="font-serif text-3xl text-espresso mb-1">18</p>
+            <p id="stat-videos" class="font-serif text-3xl text-espresso mb-1">—</p>
             <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Videos</p>
           </div>
           <div class="stat">
-            <p class="font-serif text-3xl text-espresso mb-1">5</p>
+            <p id="stat-entries" class="font-serif text-3xl text-espresso mb-1">—</p>
             <p class="font-mono text-[9px] tracking-widest text-warm uppercase">Entries</p>
           </div>
         </div>
@@ -141,19 +143,11 @@
 <!-- PHOTO STRIP -->
 <section class="px-6 md:px-14 mb-24">
   <div class="max-w-7xl mx-auto">
-    <div class="photo-strip about-reveal">
-      <div class="ps-item">
-        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80" alt="Mountains" loading="lazy">
-      </div>
-      <div class="ps-item">
-        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&q=80" alt="Forest" loading="lazy">
-      </div>
-      <div class="ps-item">
-        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&q=80" alt="Lake" loading="lazy">
-      </div>
-      <div class="ps-item hidden sm:block">
-        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&q=80" alt="Mist" loading="lazy">
-      </div>
+    <div id="photo-strip" class="photo-strip about-reveal">
+      <div class="ps-item"><div class="w-full h-[200px] md:h-[280px] bg-mist/60 animate-pulse rounded-sm"></div></div>
+      <div class="ps-item"><div class="w-full h-[200px] md:h-[280px] bg-mist/60 animate-pulse rounded-sm"></div></div>
+      <div class="ps-item"><div class="w-full h-[200px] md:h-[280px] bg-mist/60 animate-pulse rounded-sm"></div></div>
+      <div class="ps-item hidden sm:block"><div class="w-full h-[200px] md:h-[280px] bg-mist/60 animate-pulse rounded-sm"></div></div>
     </div>
   </div>
 </section>
@@ -234,6 +228,39 @@
 </footer>
 
 <script>
+firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
+const db=firebase.firestore();
+
+function cloudinaryThumb(url,w=600){return url.replace('/upload/',`/upload/w_${w},c_limit,q_80/`);}
+
+async function loadAboutData(){
+  try{
+    const [gallerySnap,videosSnap,journalSnap]=await Promise.all([
+      db.collection('gallery').orderBy('timestamp','desc').get(),
+      db.collection('videos').get(),
+      db.collection('journal').get()
+    ]);
+    document.getElementById('stat-photos').textContent=gallerySnap.size;
+    document.getElementById('stat-videos').textContent=videosSnap.size;
+    document.getElementById('stat-entries').textContent=journalSnap.size;
+    if(!gallerySnap.empty){
+      const strip=document.getElementById('photo-strip');
+      strip.innerHTML='';
+      let i=0;
+      gallerySnap.forEach(doc=>{
+        if(i>=4)return;
+        const d=doc.data();
+        const el=document.createElement('div');
+        el.className='ps-item'+(i===3?' hidden sm:block':'');
+        el.innerHTML=`<img src="${cloudinaryThumb(d.url)}" alt="${d.caption||''}" loading="lazy">`;
+        strip.appendChild(el);
+        i++;
+      });
+    }
+  }catch(e){console.error('About data load failed:',e);}
+}
+loadAboutData();
+
 // Cursor
 const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
 let mx=0,my=0,rx=0,ry=0;
