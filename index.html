@@ -240,6 +240,18 @@
   </div>
 </section>
 
+<!-- VIDEO MODAL -->
+<div id="vid-modal" class="fixed inset-0 z-[9990] bg-espresso/96 flex flex-col items-center justify-center opacity-0 pointer-events-none" style="transition:opacity .3s">
+  <button id="vid-close" class="absolute top-5 right-6 font-mono text-[9px] tracking-widest text-sand/60 uppercase hover:text-sand transition-colors p-2" aria-label="Close">&times; Close</button>
+  <video id="vid-player" class="max-w-5xl w-full max-h-[72vh] rounded-sm outline-none" controls playsinline></video>
+  <div class="mt-5 text-center">
+    <p id="vid-modal-title" class="font-serif text-xl text-cream mb-3"></p>
+    <a href="videos.html" class="inline-flex items-center gap-2 font-mono text-[9px] tracking-widest text-sand/40 uppercase hover:text-caramel transition-colors ul-link">
+      <span>Watch all videos</span><span>&rarr;</span>
+    </a>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="py-10 px-6 md:px-14 border-t border-mist">
   <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
@@ -425,9 +437,8 @@ async function loadVideosPreview() {
     snap.docs.forEach(doc => {
       const d = doc.data();
       const thumb = d.thumbnail || vidThumb(d.url);
-      const el = document.createElement('a');
-      el.href = 'videos.html';
-      el.className = 'group vcard-home';
+      const el = document.createElement('div');
+      el.className = 'group vcard-home cursor-pointer';
       el.innerHTML = `<div class="gi rounded-sm aspect-video">
           <img src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" loading="lazy">
           <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
@@ -440,6 +451,7 @@ async function loadVideosPreview() {
           <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1">${d.duration?d.duration+' &middot; ':''}${d.dateLabel||''}</p>
           <h3 class="font-serif text-xl text-espresso group-hover:text-caramel transition-colors duration-200">${d.title||''}</h3>
         </div>`;
+      el.addEventListener('click', () => openVidModal(d.url, d.title||''));
       grid.appendChild(el);
     });
   } catch(e) {
@@ -478,6 +490,30 @@ async function loadJournalPreview() {
     list.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Unable to load</p>';
   }
 }
+
+// VIDEO MODAL
+function openVidModal(src, title) {
+  const player = document.getElementById('vid-player');
+  const modal  = document.getElementById('vid-modal');
+  player.src = src;
+  player.play().catch(()=>{});
+  document.getElementById('vid-modal-title').textContent = title;
+  modal.style.opacity = '1';
+  modal.style.pointerEvents = 'auto';
+  document.body.style.overflow = 'hidden';
+}
+function closeVidModal() {
+  const player = document.getElementById('vid-player');
+  const modal  = document.getElementById('vid-modal');
+  player.pause();
+  player.src = '';
+  modal.style.opacity = '0';
+  modal.style.pointerEvents = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('vid-close').addEventListener('click', closeVidModal);
+document.getElementById('vid-modal').addEventListener('click', e => { if(e.target===document.getElementById('vid-modal'))closeVidModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape')closeVidModal(); });
 
 // BOOT
 function initAll() {
