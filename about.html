@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About �?Chen</title>
+  <title>About &middot; Chen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -104,17 +104,16 @@
       <!-- Portrait -->
       <div class="about-reveal relative">
         <div class="overflow-hidden rounded-sm">
-          <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=85" alt="Chen" class="w-full aspect-[3/4] object-cover">
+          <img src="./assets/about.png" alt="Chen" class="w-full aspect-[3/4] object-cover">
         </div>
-        <div class="absolute -bottom-4 -right-4 w-16 h-16 border border-caramel/20 rounded-sm -z-10 hidden md:block"></div>
       </div>
       <!-- Bio text -->
       <div class="about-reveal space-y-6 pt-2 md:pt-8">
         <p class="font-sans text-sm text-warm leading-relaxed">
-          I pick up a camera the way other people pick up a pen �?not to create something, exactly, but to pay attention. To slow the day down just long enough to actually see it.
+          I pick up a camera the way other people pick up a pen &mdash; not to create something, exactly, but to pay attention. To slow the day down just long enough to actually see it.
         </p>
         <p class="font-sans text-sm text-warm leading-relaxed">
-          This site started in late 2023 as a personal archive �?somewhere to put the photos that never quite fit a social feed, the videos that were only ever meant for me, the journal entries that turned out to be worth keeping.
+          This site started in late 2023 as a personal archive &mdash; somewhere to put the photos that never quite fit a social feed, the videos that were only ever meant for me, the journal entries that turned out to be worth keeping.
         </p>
         <p class="font-sans text-sm text-warm leading-relaxed">
           I don't have a style, a theme, or a subject. I have a life that I'm trying to pay attention to. This is what that looks like.
@@ -187,7 +186,7 @@
         </div>
         <div class="w-full h-px bg-mist"></div>
         <div>
-          <p class="font-sans text-sm text-espresso mb-1">Film photography �?the patience of it</p>
+          <p class="font-sans text-sm text-espresso mb-1">Film photography &mdash; the patience of it</p>
           <p class="font-mono text-[9px] text-warm tracking-wider uppercase">Medium</p>
         </div>
         <div class="w-full h-px bg-mist"></div>
@@ -256,12 +255,9 @@ btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0'
 // Animations
 gsap.registerPlugin(ScrollTrigger);
 gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
-gsap.from('.about-reveal',{opacity:0,y:28,duration:.9,stagger:.15,ease:'power3.out',
-  scrollTrigger:{trigger:'section',start:'top 82%',toggleActions:'play none none none'}
-});
 document.querySelectorAll('.about-reveal').forEach(el=>{
   gsap.from(el,{opacity:0,y:24,duration:.85,ease:'power3.out',
-    scrollTrigger:{trigger:el,start:'top 85%'}
+    scrollTrigger:{trigger:el,start:'top 88%'}
   });
 });
 </script>
