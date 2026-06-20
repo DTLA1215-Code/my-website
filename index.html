@@ -103,9 +103,20 @@
 
     /* Mobile menu */
     #mmenu { transition: opacity .3s, transform .3s; }
+    /* Progress bar & page mask */
+    #pb { position:fixed;top:0;left:0;height:1px;background:#B5936B;z-index:99996;width:0;pointer-events:none;transition:width .08s linear; }
+    #pmask { position:fixed;inset:0;background:#FAF7F2;z-index:99997;pointer-events:none;opacity:0;transition:opacity .42s ease; }
+    /* Hero word split */
+    .ww { display:inline-block;overflow:hidden;vertical-align:bottom; }
+    .wi { display:inline-block;transform:translateY(110%);will-change:transform; }
+    /* Journal row arrow */
+    .jr-arrow { display:inline-block;color:#B5936B;opacity:0;transform:translateX(-6px);transition:opacity .28s,transform .28s;margin-left:.35rem;font-size:.85em; }
+    .jr:hover .jr-arrow { opacity:1;transform:translateX(0); }
   </style>
 </head>
 <body class="bg-cream font-sans text-espresso overflow-x-hidden">
+<div id="pb"></div>
+<div id="pmask"></div>
 
 <!-- Loader -->
 <div id="loader">
@@ -142,11 +153,11 @@
   </div>
   <div class="absolute inset-0 z-[1]" style="background: linear-gradient(to top, #FAF7F2 6%, rgba(250,247,242,0.6) 22%, transparent 42%)"></div>
   <div class="relative z-10 w-full px-8 md:px-14">
-    <div class="rv">
-      <div class="ri font-serif italic text-[clamp(2.8rem,6vw,7.5rem)] font-normal leading-[1.05] text-left text-caramel">Recording daily life,</div>
+    <div class="font-serif italic text-[clamp(2.8rem,6vw,7.5rem)] font-normal leading-[1.05] text-left text-caramel">
+      <span class="ww"><span class="wi">Recording</span></span> <span class="ww"><span class="wi">daily</span></span> <span class="ww"><span class="wi">life,</span></span>
     </div>
-    <div class="rv">
-      <div class="ri font-serif italic text-[clamp(2.8rem,6vw,7.5rem)] font-extralight leading-[1.05] text-right text-caramel">reflecting on the past.</div>
+    <div class="font-serif italic text-[clamp(2.8rem,6vw,7.5rem)] font-extralight leading-[1.05] text-right text-caramel">
+      <span class="ww"><span class="wi">reflecting</span></span> <span class="ww"><span class="wi">on</span></span> <span class="ww"><span class="wi">the</span></span> <span class="ww"><span class="wi">past.</span></span>
     </div>
   </div>
   <div class="absolute bottom-8 right-8 md:right-14 z-10 flex flex-col items-center gap-3">
@@ -480,6 +491,7 @@ async function loadJournalPreview() {
           <div class="flex items-baseline gap-5">
             <span class="font-mono text-[10px] text-caramel">${String(i+1).padStart(3,'0')}</span>
             <h3 class="font-serif text-xl md:text-2xl text-cream group-hover:text-caramel transition-colors duration-200">${d.title||''}</h3>
+          <span class="jr-arrow">→</span>
           </div>
           <span class="font-mono text-[10px] text-sand/50 tracking-wider ml-8 md:ml-0">${d.dateLabel||''}</span>
         </div>
@@ -517,7 +529,7 @@ document.addEventListener('keydown', e => { if(e.key==='Escape')closeVidModal();
 
 // BOOT
 function initAll() {
-  gsap.to('.ri', { y: 0, duration: 1.1, stagger: 0.1, ease: 'expo.out', delay: 0.05 });
+  gsap.to('.wi', { y: 0, duration: 1.15, stagger: 0.065, ease: 'expo.out', delay: 0.1 });
   try { initLenis(); } catch(e) {}
   try { initAnims(); } catch(e) {}
   loadGalleryPreview();
@@ -525,7 +537,28 @@ function initAll() {
   loadJournalPreview();
 }
 
-document.querySelectorAll('.ri').forEach(el => el.style.transform = 'translateY(110%)');
+// Progress bar
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-innerHeight;
+  document.getElementById('pb').style.width=(h>0?scrollY/h*100:0)+'%';
+},{passive:true});
+// Page transitions
+;(function(){
+  const mask=document.getElementById('pmask');
+  let going=false;
+  document.addEventListener('click',e=>{
+    if(going)return;
+    const a=e.target.closest('a[href]');
+    if(!a||a.target==='_blank')return;
+    const href=a.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('http')||href.startsWith('mailto:')||href.startsWith('javascript:'))return;
+    e.preventDefault();
+    going=true;
+    mask.style.pointerEvents='auto';
+    mask.style.opacity='1';
+    setTimeout(()=>location.href=href,420);
+  });
+})();
 </script>
 </body>
 </html>

@@ -44,9 +44,15 @@
     .rv { overflow:hidden; }
     .ri { will-change:transform; transform:translateY(110%); }
 
+    /* Progress bar & page mask */
+    #pb { position:fixed;top:0;left:0;height:1px;background:#B5936B;z-index:99996;width:0;pointer-events:none;transition:width .08s linear; }
+    #pmask { position:fixed;inset:0;background:#FAF7F2;z-index:99997;pointer-events:none;opacity:1;transition:opacity .42s ease; }
     /* Journal entries list */
     .je { border-bottom:1px solid #E8DDD3; cursor:pointer; transition:background .25s, padding .25s; }
     .je:hover { background:#F2EBE2; padding-left:1.5rem; padding-right:1.5rem; }
+    /* Journal entry arrow */
+    .je-arrow { display:inline-block;color:#B5936B;opacity:0;transform:translateX(-6px);transition:opacity .28s,transform .28s;margin-left:.35rem;font-size:.85em; }
+    .je:hover .je-arrow { opacity:1;transform:translateX(0); }
 
     /* Full entry modal */
     #entry-modal {
@@ -62,6 +68,8 @@
   </style>
 </head>
 <body class="bg-cream font-sans text-espresso overflow-x-hidden">
+<div id="pb"></div>
+<div id="pmask"></div>
 
 <div class="cur hidden md:block" id="cur-dot"></div>
 <div class="cur hidden md:block" id="cur-ring"></div>
@@ -223,7 +231,7 @@ async function loadJournal(){
         const preview=(entry.content||'').substring(0,140);
         const el=document.createElement('div');
         el.className='je py-8 px-4 -mx-4 rounded-sm group'+(isLast?' border-b border-mist':'');
-        el.innerHTML=`<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1"><div class="flex items-baseline gap-5"><span class="font-mono text-[10px] text-caramel/70">${entry.numStr}</span><h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${entry.title||''}</h2></div><div class="flex items-center gap-4 ml-8 md:ml-0"><span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">${entry.tag||''}</span><span class="font-mono text-[10px] text-warm tracking-wider">${entry.dateLabel||''}</span></div></div><p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length<(entry.content||'').length?'...':''}</p><p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry &rarr;</p>`;
+        el.innerHTML=`<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1"><div class="flex items-baseline gap-5"><span class="font-mono text-[10px] text-caramel/70">${entry.numStr}</span><h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${entry.title||''}</h2><span class="je-arrow">→</span></div><div class="flex items-center gap-4 ml-8 md:ml-0"><span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">${entry.tag||''}</span><span class="font-mono text-[10px] text-warm tracking-wider">${entry.dateLabel||''}</span></div></div><p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length<(entry.content||'').length?'...':''}</p><p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry &rarr;</p>`;
         if(isAdmin){
           const delBtn=document.createElement('button');
           delBtn.className='del-btn mt-2 ml-8 md:ml-10 font-mono text-[9px] text-red-400/60 tracking-widest uppercase hover:text-red-500 transition-colors border border-red-300/40 hover:border-red-400/60 px-2 py-0.5 rounded';
@@ -247,6 +255,29 @@ async function loadJournal(){
   }
 }
 loadJournal();
+// Progress bar
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-innerHeight;
+  document.getElementById('pb').style.width=(h>0?scrollY/h*100:0)+'%';
+},{passive:true});
+// Page transitions
+;(function(){
+  const mask=document.getElementById('pmask');
+  let going=false;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{mask.style.opacity='0';}));
+  document.addEventListener('click',e=>{
+    if(going)return;
+    const a=e.target.closest('a[href]');
+    if(!a||a.target==='_blank')return;
+    const href=a.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('http')||href.startsWith('mailto:')||href.startsWith('javascript:'))return;
+    e.preventDefault();
+    going=true;
+    mask.style.pointerEvents='auto';
+    mask.style.opacity='1';
+    setTimeout(()=>location.href=href,420);
+  });
+})();
 </script>
 </body>
 </html>

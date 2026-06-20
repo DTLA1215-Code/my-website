@@ -43,6 +43,9 @@
     .ul-link:hover::after { width:100%; }
     .rv { overflow:hidden; }
     .ri { will-change:transform; transform:translateY(110%); }
+    /* Progress bar & page mask */
+    #pb { position:fixed;top:0;left:0;height:1px;background:#B5936B;z-index:99996;width:0;pointer-events:none;transition:width .08s linear; }
+    #pmask { position:fixed;inset:0;background:#FAF7F2;z-index:99997;pointer-events:none;opacity:1;transition:opacity .42s ease; }
 
     /* Video card */
     .vcard { cursor:pointer; }
@@ -73,6 +76,8 @@
   </style>
 </head>
 <body class="bg-cream font-sans text-espresso overflow-x-hidden">
+<div id="pb"></div>
+<div id="pmask"></div>
 
 <div class="cur hidden md:block" id="cur-dot"></div>
 <div class="cur hidden md:block" id="cur-ring"></div>
@@ -266,6 +271,29 @@ async function loadVideos(){
   }
 }
 loadVideos();
+// Progress bar
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-innerHeight;
+  document.getElementById('pb').style.width=(h>0?scrollY/h*100:0)+'%';
+},{passive:true});
+// Page transitions
+;(function(){
+  const mask=document.getElementById('pmask');
+  let going=false;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{mask.style.opacity='0';}));
+  document.addEventListener('click',e=>{
+    if(going)return;
+    const a=e.target.closest('a[href]');
+    if(!a||a.target==='_blank')return;
+    const href=a.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('http')||href.startsWith('mailto:')||href.startsWith('javascript:'))return;
+    e.preventDefault();
+    going=true;
+    mask.style.pointerEvents='auto';
+    mask.style.opacity='1';
+    setTimeout(()=>location.href=href,420);
+  });
+})();
 </script>
 </body>
 </html>
