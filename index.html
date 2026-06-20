@@ -104,8 +104,10 @@
     /* Mobile menu */
     #mmenu { transition: opacity .3s, transform .3s; }
     /* Progress bar & page mask */
-    #pb { position:fixed;top:0;left:0;height:1px;background:#B5936B;z-index:99996;width:0;pointer-events:none;transition:width .08s linear; }
+    #pb { position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#B5936B,#D4B896);z-index:99996;width:0;pointer-events:none;transition:width .08s linear;box-shadow:0 0 6px rgba(181,147,107,.35); }
     #pmask { position:fixed;inset:0;background:#FAF7F2;z-index:99997;pointer-events:none;opacity:0;transition:opacity .42s ease; }
+    .pb-star{position:fixed;top:-3px;pointer-events:none;z-index:99995;font-size:9px;color:#B5936B;animation:pb-star-up .75s ease-out forwards;}
+    @keyframes pb-star-up{0%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.7}100%{opacity:0;transform:translateX(-50%) translateY(-18px) scale(.15)}}
     /* Hero word split */
     .ww { display:inline-block;overflow:hidden;vertical-align:bottom; }
     .wi { display:inline-block;transform:translateY(110%);will-change:transform; }
@@ -396,6 +398,26 @@ function initAnims() {
   });
 }
 
+// Gallery 3D tilt (index preview)
+function addGiTilt(){
+  if(!matchMedia('(pointer:fine)').matches)return;
+  document.querySelectorAll('.gi').forEach(el=>{
+    if(el.dataset.tilt)return;
+    el.dataset.tilt='1';
+    el.addEventListener('mousemove',e=>{
+      const r=el.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      el.style.transform=`perspective(700px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale3d(1.02,1.02,1.02)`;
+      el.style.transition='transform 0.08s ease';
+    });
+    el.addEventListener('mouseleave',()=>{
+      el.style.transform='perspective(700px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+      el.style.transition='transform 0.6s cubic-bezier(0.23,1,0.32,1)';
+    });
+  });
+}
+
 // LOAD GALLERY PREVIEW
 async function loadGalleryPreview() {
   const grid = document.getElementById('gallery-grid');
@@ -430,6 +452,7 @@ async function loadGalleryPreview() {
       right.appendChild(el);
     });
     grid.appendChild(right);
+    setTimeout(addGiTilt, 1000);
   } catch(e) {
     grid.innerHTML = '<p class="col-span-2 py-20 text-center font-mono text-[10px] text-warm/40 tracking-widest uppercase">Unable to load</p>';
   }
@@ -537,15 +560,31 @@ function initAll() {
   loadJournalPreview();
 }
 
-// Progress bar
-window.addEventListener('scroll',()=>{
-  const h=document.documentElement.scrollHeight-innerHeight;
-  document.getElementById('pb').style.width=(h>0?scrollY/h*100:0)+'%';
-},{passive:true});
+// Progress bar + star particles
+;(function(){
+  const pb=document.getElementById('pb');
+  let _ls=0;
+  window.addEventListener('scroll',()=>{
+    const h=document.documentElement.scrollHeight-innerHeight;
+    const pct=h>0?scrollY/h*100:0;
+    pb.style.width=pct+'%';
+    const now=Date.now();
+    if(now-_ls>180&&pct>1&&pct<99){
+      _ls=now;
+      const s=document.createElement('span');
+      s.className='pb-star';
+      s.textContent='✦';
+      s.style.left=pct+'%';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),750);
+    }
+  },{passive:true});
+})();
 // Page transitions
 ;(function(){
   const mask=document.getElementById('pmask');
   let going=false;
+  window.addEventListener('pageshow',e=>{if(e.persisted){going=false;mask.style.opacity='0';mask.style.pointerEvents='none';}});
   document.addEventListener('click',e=>{
     if(going)return;
     const a=e.target.closest('a[href]');
