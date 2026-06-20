@@ -459,11 +459,11 @@ async function loadVideosPreview() {
     }
     grid.innerHTML = '';
     data.slice(0,2).forEach(d => {
-      const thumb = d.thumbnail || d.url;
+      const thumb = d.thumbnail || '';
       const el = document.createElement('div');
       el.className = 'group vcard-home cursor-pointer';
-      el.innerHTML = `<div class="gi rounded-sm aspect-video">
-          <img src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" loading="lazy">
+      el.innerHTML = `<div class="gi rounded-sm aspect-video bg-mist">
+          ${thumb ? `<img src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" loading="lazy">` : ''}
           <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
             <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -519,11 +519,12 @@ function openVidModal(src, title) {
   const player = document.getElementById('vid-player');
   const modal  = document.getElementById('vid-modal');
   player.src = src;
-  player.play().catch(()=>{});
+  player.load();
   document.getElementById('vid-modal-title').textContent = title;
   modal.style.opacity = '1';
   modal.style.pointerEvents = 'auto';
   document.body.style.overflow = 'hidden';
+  player.play().catch(()=>{});
 }
 function closeVidModal() {
   const player = document.getElementById('vid-player');
