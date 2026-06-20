@@ -64,7 +64,7 @@
 
     /* Cursor */
     @media (pointer:fine) { body, body * { cursor: none !important; } }
-    .cur { position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+    .cur { position:fixed; pointer-events:none; z-index:100001; border-radius:50%; transform:translate(-50%,-50%); }
     #cur-dot  { width:7px; height:7px; background:#B5936B; transition:width .25s,height .25s,opacity .25s; }
     #cur-ring { width:38px; height:38px; border:1px solid #B5936B; opacity:.55; transition:width .3s,height .3s,opacity .3s,background .3s; }
     body:has(a:hover) #cur-ring,
