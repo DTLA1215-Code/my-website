@@ -192,6 +192,7 @@ function openModal(el){
   vmeta.textContent=(el.dataset.dur?el.dataset.dur+' · ':'')+( el.dataset.date||'');
   vdesc.textContent=el.dataset.desc||'';
   vvideo.src=el.dataset.video;
+  vvideo.load();
   vmodal.classList.add('open');
   document.body.style.overflow='hidden';
   vvideo.play().catch(()=>{});
@@ -212,10 +213,11 @@ function attachVideoModal(){
 
 // Render featured card HTML
 function featuredHTML(d){
-  const thumb=d.thumbnail||d.url;
+  const thumb=d.thumbnail||'';
   return `<div class="featured-card cursor-pointer" data-title="${d.title||''}" data-date="${d.dateLabel||''}" data-dur="${d.duration||''}" data-desc="${d.description||''}" data-video="${d.url}">
-    <div class="featured-thumb aspect-[21/9]">
-      <img src="${thumb}" alt="${d.title||''}" loading="eager">
+    <div class="featured-thumb aspect-[21/9] bg-espresso/20">
+      ${thumb?`<img src="${thumb}" alt="${d.title||''}" loading="eager">`:''}
+
       <div class="featured-overlay">
         <div class="featured-play"><svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
       </div>
@@ -245,11 +247,12 @@ async function loadVideos(){
     }else{
       grid.innerHTML='';
       data.slice(1).forEach(d=>{
-        const thumb=d.thumbnail||d.url;
+        const thumb=d.thumbnail||'';
         const el=document.createElement('div');
         el.className='vcard';
         el.dataset.title=d.title||'';el.dataset.date=d.dateLabel||'';el.dataset.dur=d.duration||'';el.dataset.desc=d.description||'';el.dataset.video=d.url;
-        el.innerHTML=`<div class="vcard-thumb aspect-video"><img src="${thumb}" alt="${d.title||''}" loading="lazy"><div class="vcard-overlay"><div class="play-btn"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vcard-bar mt-3 mb-3"></div><p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1.5">${d.duration?d.duration+' · ':''}${d.dateLabel||''}</p><h3 class="font-serif text-lg text-espresso leading-tight">${d.title||''}</h3><p class="font-sans text-xs text-warm mt-1.5 leading-relaxed">${d.description||''}</p>`;
+        el.innerHTML=`<div class="vcard-thumb aspect-video bg-espresso/10">${thumb?`<img src="${thumb}" alt="${d.title||''}" loading="lazy">`:''}
+<div class="vcard-overlay"><div class="play-btn"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vcard-bar mt-3 mb-3"></div><p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1.5">${d.duration?d.duration+' · ':''}${d.dateLabel||''}</p><h3 class="font-serif text-lg text-espresso leading-tight">${d.title||''}</h3><p class="font-sans text-xs text-warm mt-1.5 leading-relaxed">${d.description||''}</p>`;
         grid.appendChild(el);
       });
     }
