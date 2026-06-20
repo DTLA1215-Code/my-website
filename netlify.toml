@@ -1,0 +1,5 @@
+# Override Content-Disposition for media files so browsers play inline instead of downloading
+[[headers]]
+  for = "/media/*"
+  [headers.values]
+    Content-Disposition = "inline"
