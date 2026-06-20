@@ -172,6 +172,9 @@ btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0'
 gsap.registerPlugin(ScrollTrigger);
 gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
 
+// Admin mode: visit journal.html?admin=chenyao2024 to enable delete
+const isAdmin = new URLSearchParams(location.search).get('admin') === 'chenyao2024';
+
 // Modal
 const modal=document.getElementById('entry-modal');
 function openEntry(entry,numStr){
@@ -220,7 +223,19 @@ async function loadJournal(){
         const preview=(entry.content||'').substring(0,140);
         const el=document.createElement('div');
         el.className='je py-8 px-4 -mx-4 rounded-sm group'+(isLast?' border-b border-mist':'');
-        el.innerHTML=`<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1"><div class="flex items-baseline gap-5"><span class="font-mono text-[10px] text-caramel/70">${entry.numStr}</span><h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${entry.title||''}</h2></div><div class="flex items-center gap-4 ml-8 md:ml-0"><span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">${entry.tag||''}</span><span class="font-mono text-[10px] text-warm tracking-wider">${entry.dateLabel||''}</span></div></div><p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length<(entry.content||'').length?'...':''}</p><p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry �?/p>`;
+        el.innerHTML=`<div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1"><div class="flex items-baseline gap-5"><span class="font-mono text-[10px] text-caramel/70">${entry.numStr}</span><h2 class="font-serif text-xl md:text-2xl text-espresso group-hover:text-caramel transition-colors duration-200">${entry.title||''}</h2></div><div class="flex items-center gap-4 ml-8 md:ml-0"><span class="font-mono text-[9px] text-caramel/60 border border-caramel/30 px-2 py-0.5 rounded-full">${entry.tag||''}</span><span class="font-mono text-[10px] text-warm tracking-wider">${entry.dateLabel||''}</span></div></div><p class="mt-3 font-sans text-sm text-warm leading-relaxed max-w-2xl ml-8 md:ml-10">${preview}${preview.length<(entry.content||'').length?'...':''}</p><p class="mt-3 ml-8 md:ml-10 font-mono text-[9px] text-caramel/60 tracking-widest uppercase group-hover:text-caramel transition-colors">Read entry &rarr;</p>`;
+        if(isAdmin){
+          const delBtn=document.createElement('button');
+          delBtn.className='del-btn mt-2 ml-8 md:ml-10 font-mono text-[9px] text-red-400/60 tracking-widest uppercase hover:text-red-500 transition-colors border border-red-300/40 hover:border-red-400/60 px-2 py-0.5 rounded';
+          delBtn.textContent='Delete';
+          el.appendChild(delBtn);
+          delBtn.addEventListener('click',async(ev)=>{
+            ev.stopPropagation();
+            if(!confirm('Delete "'+( entry.title||'')+'"? This cannot be undone.'))return;
+            try{await db.collection('journal').doc(entry.id).delete();loadJournal();}
+            catch(err){alert('Failed: '+err.message);}
+          });
+        }
         el.addEventListener('click',()=>openEntry(entry,entry.numStr));
         group.appendChild(el);
       });
