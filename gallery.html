@@ -71,8 +71,8 @@
     .ri { will-change:transform; transform:translateY(110%); }
     /* Progress bar & page mask */
     #pb { position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#B5936B,#D4B896);z-index:99996;width:0;pointer-events:none;transition:width .08s linear;box-shadow:0 0 6px rgba(181,147,107,.35); }
-    .pb-star{position:fixed;top:-3px;pointer-events:none;z-index:99995;font-size:9px;color:#B5936B;animation:pb-star-up .75s ease-out forwards;}
-    @keyframes pb-star-up{0%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.7}100%{opacity:0;transform:translateX(-50%) translateY(-18px) scale(.15)}}
+    .pb-star{position:fixed;top:1px;pointer-events:none;z-index:99995;color:#B5936B;animation:pb-star-fall var(--dur,.9s) ease-in var(--delay,0s) both;}
+    @keyframes pb-star-fall{0%{opacity:1;transform:translateX(var(--dx,0px)) translateY(0) scale(1) rotate(0deg)}70%{opacity:.55}100%{opacity:0;transform:translateX(var(--dx,0px)) translateY(var(--dy,50px)) scale(.1) rotate(200deg)}}
     #pmask { position:fixed;inset:0;background:#FAF7F2;z-index:99997;pointer-events:none;opacity:1;transition:opacity .42s ease; }
   </style>
 </head>
@@ -267,14 +267,24 @@ loadGallery();
     const pct=h>0?scrollY/h*100:0;
     pb.style.width=pct+'%';
     const now=Date.now();
-    if(now-_ls>180&&pct>1&&pct<99){
+    if(now-_ls>220&&pct>1&&pct<99){
       _ls=now;
-      const s=document.createElement('span');
-      s.className='pb-star';
-      s.textContent='✦';
-      s.style.left=pct+'%';
-      document.body.appendChild(s);
-      setTimeout(()=>s.remove(),750);
+      const _n=4+Math.floor(Math.random()*3);
+      for(let _i=0;_i<_n;_i++){
+        const s=document.createElement('span');
+        s.className='pb-star';
+        s.textContent=Math.random()>.45?'✦':'✧';
+        s.style.left=pct+'%';
+        s.style.fontSize=(6+Math.random()*7).toFixed(1)+'px';
+        s.style.setProperty('--dx',((Math.random()-.5)*32).toFixed(1)+'px');
+        s.style.setProperty('--dy',(30+Math.random()*45).toFixed(1)+'px');
+        const _d=(.6+Math.random()*.6).toFixed(2);
+        const _dl=(Math.random()*.2).toFixed(2);
+        s.style.setProperty('--dur',_d+'s');
+        s.style.setProperty('--delay',_dl+'s');
+        document.body.appendChild(s);
+        setTimeout(()=>s.remove(),(+_d+ +_dl)*1000+200);
+      }
     }
   },{passive:true});
 })();
