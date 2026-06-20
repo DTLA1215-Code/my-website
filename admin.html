@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · chenyao daily</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: {
+        cream:'#FAF7F2', espresso:'#2D2926', warm:'#6B5E52',
+        caramel:'#B5936B', sand:'#D4B896', mist:'#E8DDD3', surface:'#F2EBE2'
+      }, fontFamily: { serif:['Playfair Display','Georgia','serif'], mono:['DM Mono','monospace'] } } }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .tab-btn.active { border-color:#B5936B !important; color:#B5936B !important; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    .drop-zone { border:2px dashed #D4B896; transition:all .2s; }
+    .drop-zone.over { border-color:#B5936B; background:#FAF7F2; }
+    .pbar { height:3px; background:linear-gradient(90deg,#B5936B,#D4B896); transition:width .3s; border-radius:9px; }
+    input, textarea, select { outline:none; }
+    input:focus, textarea:focus, select:focus { border-color:#B5936B !important; }
+  </style>
+</head>
+<body class="bg-surface min-h-screen">
+
+<!-- Password Gate -->
+<div id="gate" class="fixed inset-0 bg-surface flex items-center justify-center z-50">
+  <div class="bg-cream border border-mist rounded-xl p-10 shadow-sm max-w-sm w-full mx-4">
+    <p class="font-mono text-[10px] tracking-[.3em] text-caramel uppercase mb-2">chenyao daily</p>
+    <h1 class="font-serif text-2xl text-espresso mb-6">管理后台</h1>
+    <input id="pw-in" type="password" placeholder="密码"
+      class="w-full border border-mist rounded-lg px-4 py-3 text-sm text-espresso bg-surface mb-3">
+    <button id="pw-btn" class="w-full bg-espresso text-cream font-mono text-xs tracking-widest py-3 rounded-lg hover:bg-caramel transition-colors">进入</button>
+    <p id="pw-err" class="text-red-400 text-xs mt-2 text-center hidden">密码错误</p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="hidden max-w-2xl mx-auto px-5 py-10">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <p class="font-mono text-[9px] tracking-[.3em] text-caramel uppercase mb-1">管理后台</p>
+      <h1 class="font-serif text-2xl text-espresso">chenyao daily</h1>
+    </div>
+    <a href="index.html" class="font-mono text-[9px] text-warm tracking-wider hover:text-caramel transition-colors">← 返回网站</a>
+  </div>
+
+  <!-- GitHub PAT -->
+  <div class="bg-cream border border-mist rounded-xl p-5 mb-6">
+    <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-3">GitHub Token（首次使用填写一次）</p>
+    <div class="flex gap-3">
+      <input id="pat-in" type="password" placeholder="ghp_xxxxxxxxxxxx"
+        class="flex-1 border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface font-mono">
+      <button id="pat-save" class="font-mono text-[9px] tracking-wider px-4 py-2 border border-espresso text-espresso rounded-lg hover:bg-espresso hover:text-cream transition-colors">保存</button>
+    </div>
+    <p id="pat-msg" class="font-mono text-[9px] text-warm mt-2"></p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-2 mb-5">
+    <button class="tab-btn active font-mono text-[9px] tracking-wider px-4 py-2 border border-mist text-warm rounded-lg transition-colors" data-tab="gallery">照片</button>
+    <button class="tab-btn font-mono text-[9px] tracking-wider px-4 py-2 border border-mist text-warm rounded-lg transition-colors" data-tab="videos">视频</button>
+    <button class="tab-btn font-mono text-[9px] tracking-wider px-4 py-2 border border-mist text-warm rounded-lg transition-colors" data-tab="journal">日记</button>
+    <button class="tab-btn font-mono text-[9px] tracking-wider px-4 py-2 border border-mist text-warm rounded-lg transition-colors" data-tab="manage">管理</button>
+  </div>
+
+  <!-- ── Gallery ── -->
+  <div id="tab-gallery" class="tab-panel active">
+    <div class="bg-cream border border-mist rounded-xl p-6">
+      <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-5">上传照片</p>
+      <div id="g-zone" class="drop-zone rounded-xl p-10 text-center cursor-pointer mb-4">
+        <p class="font-mono text-[9px] text-warm tracking-wider mb-1">点击或拖拽图片至此</p>
+        <p class="font-mono text-[8px] text-warm/50">JPG · PNG · WEBP</p>
+        <input id="g-file" type="file" accept="image/*" multiple class="hidden">
+      </div>
+      <div id="g-prev" class="hidden mb-4">
+        <img id="g-prev-img" class="w-full max-h-40 object-cover rounded-lg mb-1.5">
+        <p id="g-prev-name" class="font-mono text-[9px] text-warm"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">说明文字</label>
+          <input id="g-caption" type="text" placeholder="照片描述..."
+            class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+        </div>
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">分类</label>
+          <select id="g-cat" class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+            <option value="all">全部</option>
+            <option value="travel">旅行</option>
+            <option value="food">美食</option>
+            <option value="life">日常</option>
+            <option value="nature">自然</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-5">
+        <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">日期</label>
+        <input id="g-date" type="date" class="border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+      </div>
+      <div id="g-prog" class="hidden mb-4">
+        <div class="w-full bg-mist rounded-full h-0.5 mb-2"><div id="g-pbar" class="pbar w-0"></div></div>
+        <p id="g-msg" class="font-mono text-[9px] text-warm"></p>
+      </div>
+      <button id="g-btn" class="w-full bg-espresso text-cream font-mono text-xs tracking-widest py-3 rounded-lg hover:bg-caramel transition-colors">上传照片</button>
+    </div>
+  </div>
+
+  <!-- ── Videos ── -->
+  <div id="tab-videos" class="tab-panel">
+    <div class="bg-cream border border-mist rounded-xl p-6">
+      <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-5">上传视频</p>
+      <div id="v-zone" class="drop-zone rounded-xl p-10 text-center cursor-pointer mb-4">
+        <p class="font-mono text-[9px] text-warm tracking-wider mb-1">点击或拖拽视频至此</p>
+        <p class="font-mono text-[8px] text-warm/50">MP4 · MOV · 最大 100MB</p>
+        <input id="v-file" type="file" accept="video/*" class="hidden">
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">标题</label>
+          <input id="v-title" type="text" placeholder="视频标题..."
+            class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+        </div>
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">时长（如 3:42）</label>
+          <input id="v-dur" type="text" placeholder="0:00"
+            class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">描述</label>
+        <textarea id="v-desc" rows="2" placeholder="简短介绍..."
+          class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface resize-none"></textarea>
+      </div>
+      <div class="mb-5">
+        <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">日期</label>
+        <input id="v-date" type="date" class="border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+      </div>
+      <div id="v-prog" class="hidden mb-4">
+        <div class="w-full bg-mist rounded-full h-0.5 mb-2"><div id="v-pbar" class="pbar w-0"></div></div>
+        <p id="v-msg" class="font-mono text-[9px] text-warm"></p>
+      </div>
+      <button id="v-btn" class="w-full bg-espresso text-cream font-mono text-xs tracking-widest py-3 rounded-lg hover:bg-caramel transition-colors">上传视频</button>
+    </div>
+  </div>
+
+  <!-- ── Journal ── -->
+  <div id="tab-journal" class="tab-panel">
+    <div class="bg-cream border border-mist rounded-xl p-6">
+      <p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-5">写日记</p>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">标题</label>
+          <input id="j-title" type="text" placeholder="日记标题..."
+            class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+        </div>
+        <div>
+          <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">标签</label>
+          <input id="j-tag" type="text" placeholder="生活 / 旅行 / 思考..."
+            class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">内容（空行分段）</label>
+        <textarea id="j-content" rows="10" placeholder="在这里写日记..."
+          class="w-full border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface resize-none leading-relaxed"></textarea>
+      </div>
+      <div class="mb-5">
+        <label class="font-mono text-[9px] text-warm tracking-wider block mb-1.5">日期</label>
+        <input id="j-date" type="date" class="border border-mist rounded-lg px-3 py-2 text-sm text-espresso bg-surface">
+      </div>
+      <div id="j-prog" class="hidden mb-3">
+        <p id="j-msg" class="font-mono text-[9px] text-warm"></p>
+      </div>
+      <button id="j-btn" class="w-full bg-espresso text-cream font-mono text-xs tracking-widest py-3 rounded-lg hover:bg-caramel transition-colors">发布日记</button>
+    </div>
+  </div>
+
+  <!-- ── Manage ── -->
+  <div id="tab-manage" class="tab-panel">
+    <div class="bg-cream border border-mist rounded-xl p-6">
+      <div class="flex items-center justify-between mb-5">
+        <p class="font-mono text-[9px] text-caramel tracking-wider uppercase">内容管理</p>
+        <button id="m-load" class="font-mono text-[9px] tracking-wider px-3 py-1.5 border border-mist text-warm rounded-lg hover:border-caramel hover:text-caramel transition-colors">加载内容</button>
+      </div>
+      <div id="m-content"><p class="font-mono text-[9px] text-warm/40 text-center py-8">点击「加载内容」查看并管理已有内容</p></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────
+const AK='YgNXquVVM9yqAEX6tXmXenhm8G5xfUAeiiZlvGW4';
+const SK='mAZFUhzCBN4fb3_OmhpkvhkHej8YkEmGsiP8go5E';
+const BUCKET='chenyao-website';
+const MEDIA_BASE='https://chenyao-website.s3-cn-east-1.qiniucs.com';
+const UP_URL='https://up-z0.qiniup.com';
+const GH_OWNER='DTLA1215-Code';
+const GH_REPO='my-website';
+const GH_BRANCH='main';
+const PW='chenyao2024';
+
+// ── Password ────────────────────────────────────────────────
+const gate=document.getElementById('gate');
+const app=document.getElementById('app');
+function tryPw(){
+  if(document.getElementById('pw-in').value===PW){
+    gate.style.display='none'; app.classList.remove('hidden');
+    const saved=localStorage.getItem('gh_pat');
+    if(saved){document.getElementById('pat-in').value=saved;document.getElementById('pat-msg').textContent='Token 已加载';}
+    const today=new Date().toISOString().split('T')[0];
+    ['g-date','v-date','j-date'].forEach(id=>{document.getElementById(id).value=today;});
+  } else {
+    document.getElementById('pw-err').classList.remove('hidden');
+  }
+}
+document.getElementById('pw-btn').addEventListener('click',tryPw);
+document.getElementById('pw-in').addEventListener('keydown',e=>{if(e.key==='Enter')tryPw();});
+
+// ── GitHub PAT ──────────────────────────────────────────────
+document.getElementById('pat-save').addEventListener('click',()=>{
+  const v=document.getElementById('pat-in').value.trim();
+  if(v){localStorage.setItem('gh_pat',v);document.getElementById('pat-msg').textContent='✓ 已保存';}
+});
+const getPat=()=>document.getElementById('pat-in').value.trim()||localStorage.getItem('gh_pat')||'';
+
+// ── Tabs ────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Utils ───────────────────────────────────────────────────
+function fmtDate(s){return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function getYear(s){return new Date(s+'T12:00:00').getFullYear();}
+function genKey(pfx,ext){return `${pfx}_${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;}
+
+// b64 helpers for Unicode content
+function b64enc(str){return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,(_,p)=>String.fromCharCode(parseInt(p,16))));}
+function b64dec(str){return decodeURIComponent(atob(str.replace(/\n/g,'')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));}
+
+// ── Qiniu token ─────────────────────────────────────────────
+function b64url(s){return btoa(s).replace(/\+/g,'-').replace(/\//g,'_');}
+function u8b64url(a){return btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_');}
+async function genToken(){
+  const pol={scope:BUCKET,deadline:Math.floor(Date.now()/1000)+7200};
+  const ep=b64url(JSON.stringify(pol));
+  const enc=new TextEncoder();
+  const k=await crypto.subtle.importKey('raw',enc.encode(SK),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const sig=await crypto.subtle.sign('HMAC',k,enc.encode(ep));
+  return `${AK}:${u8b64url(new Uint8Array(sig))}:${ep}`;
+}
+
+// ── Qiniu upload ────────────────────────────────────────────
+async function upload(file,key,onP){
+  const token=await genToken();
+  return new Promise((res,rej)=>{
+    const xhr=new XMLHttpRequest(),form=new FormData();
+    form.append('token',token);form.append('key',key);form.append('file',file);
+    xhr.upload.onprogress=e=>{if(e.lengthComputable)onP(e.loaded/e.total);};
+    xhr.onload=()=>{xhr.status===200?res(JSON.parse(xhr.responseText)):rej(new Error('上传失败 '+xhr.status));};
+    xhr.onerror=()=>rej(new Error('网络错误'));
+    xhr.open('POST',UP_URL);xhr.send(form);
+  });
+}
+
+// ── GitHub API ──────────────────────────────────────────────
+const ghHeaders=pat=>({'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'});
+async function ghGet(path,pat){
+  const r=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`,{headers:ghHeaders(pat)});
+  if(!r.ok)throw new Error('GitHub 读取失败，请检查 Token');
+  return r.json();
+}
+async function ghPut(path,data,sha,pat){
+  const r=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`,{
+    method:'PUT',headers:ghHeaders(pat),
+    body:JSON.stringify({message:`update ${path}`,content:b64enc(JSON.stringify(data,null,2)),sha,branch:GH_BRANCH})
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.message||'GitHub 写入失败');}
+}
+async function prepend(path,item,pat){
+  const f=await ghGet(path,pat);
+  const arr=JSON.parse(b64dec(f.content));
+  arr.unshift(item);
+  await ghPut(path,arr,f.sha,pat);
+}
+async function removeItem(path,id,pat){
+  const f=await ghGet(path,pat);
+  const arr=JSON.parse(b64dec(f.content)).filter(x=>x.id!==id);
+  await ghPut(path,arr,f.sha,pat);
+}
+
+// ── Drop zones ──────────────────────────────────────────────
+function initDrop(zoneId,inputId,cb){
+  const z=document.getElementById(zoneId),inp=document.getElementById(inputId);
+  z.addEventListener('click',()=>inp.click());
+  z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over');});
+  z.addEventListener('dragleave',()=>z.classList.remove('over'));
+  z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('over');if(e.dataTransfer.files[0])cb(e.dataTransfer.files[0]);});
+  inp.addEventListener('change',()=>{if(inp.files[0])cb(inp.files[0]);});
+}
+
+// ── Gallery ─────────────────────────────────────────────────
+let gFile=null;
+initDrop('g-zone','g-file',f=>{
+  gFile=f;
+  document.getElementById('g-prev').classList.remove('hidden');
+  document.getElementById('g-prev-img').src=URL.createObjectURL(f);
+  document.getElementById('g-prev-name').textContent=`${f.name} · ${(f.size/1048576).toFixed(1)} MB`;
+});
+document.getElementById('g-btn').addEventListener('click',async()=>{
+  const pat=getPat();
+  if(!pat){alert('请先填入 GitHub Token');return;}
+  if(!gFile){alert('请选择图片');return;}
+  const dateStr=document.getElementById('g-date').value;
+  const ext=gFile.name.split('.').pop().toLowerCase()||'jpg';
+  const key=genKey('photo',ext);
+  const prog=document.getElementById('g-prog'),pbar=document.getElementById('g-pbar'),msg=document.getElementById('g-msg');
+  prog.classList.remove('hidden');msg.textContent='正在上传...';
+  try{
+    await upload(gFile,key,p=>{pbar.style.width=(p*85)+'%';});
+    msg.textContent='上传完成，正在保存数据...';pbar.style.width='92%';
+    await prepend('data/gallery.json',{
+      id:'g_'+Date.now(),
+      url:`${MEDIA_BASE}/${key}`,
+      caption:document.getElementById('g-caption').value.trim(),
+      category:document.getElementById('g-cat').value,
+      dateLabel:fmtDate(dateStr),year:getYear(dateStr),timestamp:Date.now()
+    },pat);
+    pbar.style.width='100%';msg.textContent='✓ 照片已发布！网站约1分钟后更新。';
+    gFile=null;document.getElementById('g-prev').classList.add('hidden');
+    document.getElementById('g-caption').value='';
+  }catch(e){msg.textContent='❌ '+e.message;}
+});
+
+// ── Videos ──────────────────────────────────────────────────
+let vFile=null;
+initDrop('v-zone','v-file',f=>{
+  vFile=f;
+  document.getElementById('v-prog').classList.remove('hidden');
+  document.getElementById('v-msg').textContent=`已选择: ${f.name} · ${(f.size/1048576).toFixed(1)} MB`;
+});
+document.getElementById('v-btn').addEventListener('click',async()=>{
+  const pat=getPat();
+  if(!pat){alert('请先填入 GitHub Token');return;}
+  if(!vFile){alert('请选择视频');return;}
+  const title=document.getElementById('v-title').value.trim();
+  if(!title){alert('请填写视频标题');return;}
+  const dateStr=document.getElementById('v-date').value;
+  const ext=vFile.name.split('.').pop().toLowerCase()||'mp4';
+  const key=genKey('video',ext);
+  const prog=document.getElementById('v-prog'),pbar=document.getElementById('v-pbar'),msg=document.getElementById('v-msg');
+  prog.classList.remove('hidden');msg.textContent='正在上传视频...（大文件需要一点时间）';
+  try{
+    await upload(vFile,key,p=>{pbar.style.width=(p*85)+'%';});
+    msg.textContent='上传完成，正在保存数据...';pbar.style.width='92%';
+    await prepend('data/videos.json',{
+      id:'v_'+Date.now(),
+      url:`${MEDIA_BASE}/${key}`,
+      thumbnail:'',
+      title,
+      description:document.getElementById('v-desc').value.trim(),
+      duration:document.getElementById('v-dur').value.trim(),
+      dateLabel:fmtDate(dateStr),year:getYear(dateStr),timestamp:Date.now()
+    },pat);
+    pbar.style.width='100%';msg.textContent='✓ 视频已发布！网站约1分钟后更新。';
+    vFile=null;['v-title','v-desc','v-dur'].forEach(id=>{document.getElementById(id).value='';});
+  }catch(e){msg.textContent='❌ '+e.message;}
+});
+
+// ── Journal ─────────────────────────────────────────────────
+document.getElementById('j-btn').addEventListener('click',async()=>{
+  const pat=getPat();
+  if(!pat){alert('请先填入 GitHub Token');return;}
+  const title=document.getElementById('j-title').value.trim();
+  const content=document.getElementById('j-content').value.trim();
+  if(!title||!content){alert('请填写标题和内容');return;}
+  const dateStr=document.getElementById('j-date').value;
+  const prog=document.getElementById('j-prog'),msg=document.getElementById('j-msg');
+  prog.classList.remove('hidden');msg.textContent='正在保存...';
+  try{
+    await prepend('data/journal.json',{
+      id:'j_'+Date.now(),
+      title,content,
+      tag:document.getElementById('j-tag').value.trim(),
+      dateLabel:fmtDate(dateStr),year:getYear(dateStr),timestamp:Date.now()
+    },pat);
+    msg.textContent='✓ 日记已发布！网站约1分钟后更新。';
+    ['j-title','j-content','j-tag'].forEach(id=>{document.getElementById(id).value='';});
+  }catch(e){msg.textContent='❌ '+e.message;}
+});
+
+// ── Manage ──────────────────────────────────────────────────
+document.getElementById('m-load').addEventListener('click',async()=>{
+  const pat=getPat();
+  if(!pat){alert('请先填入 GitHub Token');return;}
+  const el=document.getElementById('m-content');
+  el.innerHTML='<p class="font-mono text-[9px] text-warm/40 text-center py-6">加载中...</p>';
+  try{
+    const [gf,vf,jf]=await Promise.all([ghGet('data/gallery.json',pat),ghGet('data/videos.json',pat),ghGet('data/journal.json',pat)]);
+    const gallery=JSON.parse(b64dec(gf.content));
+    const videos=JSON.parse(b64dec(vf.content));
+    const journal=JSON.parse(b64dec(jf.content));
+    const dBtn=(type,id)=>`<button class="di font-mono text-[8px] text-red-400/60 hover:text-red-500 border border-red-200 hover:border-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap" data-type="${type}" data-id="${id}">删除</button>`;
+    const section=(label,items,type,nameFn)=>{
+      if(!items.length)return '';
+      return `<p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-3 mt-5">${label}（${items.length}）</p>`
+        +items.map(d=>`<div class="flex items-center justify-between py-2 border-b border-mist gap-3"><span class="text-sm text-espresso truncate">${nameFn(d)}</span><div class="flex items-center gap-2 shrink-0"><span class="font-mono text-[8px] text-warm whitespace-nowrap">${d.dateLabel||''}</span>${dBtn(type,d.id)}</div></div>`).join('');
+    };
+    let html=section('照片',gallery,'gallery',d=>d.caption||d.url.split('/').pop())
+      +section('视频',videos,'videos',d=>d.title||'')
+      +section('日记',journal,'journal',d=>d.title||'');
+    if(!html)html='<p class="font-mono text-[9px] text-warm/40 text-center py-8">暂无内容</p>';
+    el.innerHTML=html;
+    el.querySelectorAll('.di').forEach(btn=>{
+      btn.addEventListener('click',async()=>{
+        if(!confirm('确认删除？此操作不可恢复。'))return;
+        const {type,id}=btn.dataset;
+        const pathMap={gallery:'data/gallery.json',videos:'data/videos.json',journal:'data/journal.json'};
+        try{
+          await removeItem(pathMap[type],id,pat);
+          btn.closest('div').remove();
+        }catch(e){alert('删除失败: '+e.message);}
+      });
+    });
+  }catch(e){
+    el.innerHTML=`<p class="font-mono text-[9px] text-red-400 text-center py-4">加载失败: ${e.message}</p>`;
+  }
+});
+</script>
+</body>
+</html>

@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
@@ -235,33 +233,24 @@
 </footer>
 
 <script>
-firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
-const db=firebase.firestore();
-
-function cloudinaryThumb(url,w=600){return url.replace('/upload/',`/upload/w_${w},c_limit,q_80/`);}
-
 async function loadAboutData(){
   try{
-    const [gallerySnap,videosSnap,journalSnap]=await Promise.all([
-      db.collection('gallery').orderBy('timestamp','desc').get(),
-      db.collection('videos').get(),
-      db.collection('journal').get()
+    const [gallery,videos,journal]=await Promise.all([
+      fetch('/data/gallery.json').then(r=>r.json()),
+      fetch('/data/videos.json').then(r=>r.json()),
+      fetch('/data/journal.json').then(r=>r.json())
     ]);
-    document.getElementById('stat-photos').textContent=gallerySnap.size;
-    document.getElementById('stat-videos').textContent=videosSnap.size;
-    document.getElementById('stat-entries').textContent=journalSnap.size;
-    if(!gallerySnap.empty){
+    document.getElementById('stat-photos').textContent=gallery.length;
+    document.getElementById('stat-videos').textContent=videos.length;
+    document.getElementById('stat-entries').textContent=journal.length;
+    if(gallery.length){
       const strip=document.getElementById('photo-strip');
       strip.innerHTML='';
-      let i=0;
-      gallerySnap.forEach(doc=>{
-        if(i>=4)return;
-        const d=doc.data();
+      gallery.slice(0,4).forEach((d,i)=>{
         const el=document.createElement('div');
         el.className='ps-item'+(i===3?' hidden sm:block':'');
-        el.innerHTML=`<img src="${cloudinaryThumb(d.url)}" alt="${d.caption||''}" loading="lazy">`;
+        el.innerHTML=`<img src="${d.url}" alt="${d.caption||''}" loading="lazy">`;
         strip.appendChild(el);
-        i++;
       });
     }
   }catch(e){console.error('About data load failed:',e);}

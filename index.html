@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -280,12 +278,6 @@
 </footer>
 
 <script>
-// Firebase
-firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
-const db = firebase.firestore();
-
-function imgThumb(url, w=600) { return url.replace('/upload/', `/upload/w_${w},c_limit,q_95/`); }
-function vidThumb(url) { return url.replace('/video/upload/','/video/upload/so_0,w_700,q_80/').replace(/\.(mp4|mov|avi|webm|mkv)$/i,'.jpg'); }
 
 // CURSOR
 ;(function() {
@@ -422,30 +414,28 @@ function addGiTilt(){
 async function loadGalleryPreview() {
   const grid = document.getElementById('gallery-grid');
   try {
-    const snap = await db.collection('gallery').orderBy('timestamp','desc').limit(3).get();
-    if (snap.empty) {
+    const data = await fetch('/data/gallery.json').then(r=>r.json());
+    if (!data.length) {
       grid.innerHTML = '<p class="col-span-2 py-20 text-center font-mono text-[10px] text-warm/40 tracking-widest uppercase">No photos yet</p>';
       return;
     }
-    const docs = snap.docs;
     grid.innerHTML = '';
-    const d0 = docs[0].data();
+    const d0 = data[0];
     const big = document.createElement('a');
     big.href = 'gallery.html';
     big.className = 'gi rounded-sm overflow-hidden block h-full';
-    big.innerHTML = `<img src="${imgThumb(d0.url,900)}" alt="${d0.caption||''}" class="w-full h-full object-cover" loading="lazy">
+    big.innerHTML = `<img src="${d0.url}" alt="${d0.caption||''}" class="w-full h-full object-cover" loading="lazy">
       <div class="ov absolute inset-0 bg-espresso/40 flex items-end p-5 md:p-8">
         <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">${d0.dateLabel||''}</p><p class="font-serif text-white text-lg md:text-2xl leading-tight">${d0.caption||''}</p></div>
       </div>`;
     grid.appendChild(big);
     const right = document.createElement('div');
     right.className = 'grid grid-rows-2 gap-3 md:gap-4 h-full';
-    docs.slice(1,3).forEach(doc => {
-      const d = doc.data();
+    data.slice(1,3).forEach(d => {
       const el = document.createElement('a');
       el.href = 'gallery.html';
       el.className = 'gi rounded-sm overflow-hidden block h-full';
-      el.innerHTML = `<img src="${imgThumb(d.url,600)}" alt="${d.caption||''}" class="w-full h-full object-cover" loading="lazy">
+      el.innerHTML = `<img src="${d.url}" alt="${d.caption||''}" class="w-full h-full object-cover" loading="lazy">
         <div class="ov absolute inset-0 bg-espresso/40 flex items-end p-4 md:p-5">
           <p class="font-serif text-white text-sm md:text-base leading-tight">${d.caption||''}</p>
         </div>`;
@@ -462,15 +452,14 @@ async function loadGalleryPreview() {
 async function loadVideosPreview() {
   const grid = document.getElementById('videos-grid');
   try {
-    const snap = await db.collection('videos').orderBy('timestamp','desc').limit(2).get();
-    if (snap.empty) {
+    const data = await fetch('/data/videos.json').then(r=>r.json());
+    if (!data.length) {
       grid.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">No videos yet</p>';
       return;
     }
     grid.innerHTML = '';
-    snap.docs.forEach(doc => {
-      const d = doc.data();
-      const thumb = d.thumbnail || vidThumb(d.url);
+    data.slice(0,2).forEach(d => {
+      const thumb = d.thumbnail || d.url;
       const el = document.createElement('div');
       el.className = 'group vcard-home cursor-pointer';
       el.innerHTML = `<div class="gi rounded-sm aspect-video">
@@ -497,16 +486,15 @@ async function loadVideosPreview() {
 async function loadJournalPreview() {
   const list = document.getElementById('journal-list');
   try {
-    const snap = await db.collection('journal').orderBy('timestamp','desc').limit(3).get();
-    if (snap.empty) {
+    const data = await fetch('/data/journal.json').then(r=>r.json());
+    if (!data.length) {
       list.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">No entries yet</p>';
       return;
     }
     list.innerHTML = '';
-    snap.docs.forEach((doc, i) => {
-      const d = doc.data();
+    data.slice(0,3).forEach((d, i) => {
       const preview = (d.content||'').substring(0, 120);
-      const isLast = i === snap.docs.length - 1;
+      const isLast = i === Math.min(data.length,3) - 1;
       const el = document.createElement('a');
       el.href = 'journal.html';
       el.className = 'jr jr-dark block py-7 px-4 -mx-4 rounded-sm group' + (isLast ? ' border-b border-white/10' : '');

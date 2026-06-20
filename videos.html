@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
@@ -160,8 +158,6 @@
 </footer>
 
 <script>
-firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
-const db=firebase.firestore();
 
 // Cursor
 const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
@@ -183,10 +179,6 @@ btn.addEventListener('click',()=>{mopen=!mopen;mmenu.style.opacity=mopen?'1':'0'
 gsap.registerPlugin(ScrollTrigger);
 gsap.to('.ri',{y:0,duration:1.1,stagger:.1,ease:'expo.out',delay:.1});
 
-// Cloudinary: generate thumbnail from video URL
-function cloudinaryThumb(url){
-  return url.replace('/video/upload/','/video/upload/so_0,w_700,q_80/').replace(/\.(mp4|mov|avi|webm|mkv)$/i,'.jpg');
-}
 
 // Modal
 const vmodal=document.getElementById('vmodal');
@@ -220,7 +212,7 @@ function attachVideoModal(){
 
 // Render featured card HTML
 function featuredHTML(d){
-  const thumb=d.thumbnail||cloudinaryThumb(d.url);
+  const thumb=d.thumbnail||d.url;
   return `<div class="featured-card cursor-pointer" data-title="${d.title||''}" data-date="${d.dateLabel||''}" data-dur="${d.duration||''}" data-desc="${d.description||''}" data-video="${d.url}">
     <div class="featured-thumb aspect-[21/9]">
       <img src="${thumb}" alt="${d.title||''}" loading="eager">
@@ -239,24 +231,21 @@ async function loadVideos(){
   const featSec=document.getElementById('featured-section');
   const grid=document.getElementById('video-grid');
   try{
-    const snap=await db.collection('videos').orderBy('timestamp','desc').get();
-    if(snap.empty){
+    const data=await fetch('/data/videos.json').then(r=>r.json());
+    if(!data.length){
       featSec.innerHTML='';
       grid.innerHTML='<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 col-span-full text-center">No videos yet</p>';
       return;
     }
-    const docs=snap.docs;
     // Featured: first/latest video
-    const featData=docs[0].data();
-    featSec.innerHTML=`<div class="max-w-7xl mx-auto">${featuredHTML(featData)}</div>`;
+    featSec.innerHTML=`<div class="max-w-7xl mx-auto">${featuredHTML(data[0])}</div>`;
     // Grid: remaining
-    if(docs.length<=1){
+    if(data.length<=1){
       grid.innerHTML='<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10 col-span-full text-center">More coming soon</p>';
     }else{
       grid.innerHTML='';
-      docs.slice(1).forEach(doc=>{
-        const d=doc.data();
-        const thumb=d.thumbnail||cloudinaryThumb(d.url);
+      data.slice(1).forEach(d=>{
+        const thumb=d.thumbnail||d.url;
         const el=document.createElement('div');
         el.className='vcard';
         el.dataset.title=d.title||'';el.dataset.date=d.dateLabel||'';el.dataset.dur=d.duration||'';el.dataset.desc=d.description||'';el.dataset.video=d.url;

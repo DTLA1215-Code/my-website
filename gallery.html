@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.19/dist/lenis.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
@@ -161,8 +159,6 @@
 </footer>
 
 <script>
-firebase.initializeApp({apiKey:"AIzaSyCc-w_M9kjc_Km-thLGJU9lLnT0jeFXFHQ",authDomain:"my-website-620d8.firebaseapp.com",projectId:"my-website-620d8",storageBucket:"my-website-620d8.firebasestorage.app",messagingSenderId:"902954371903",appId:"1:902954371903:web:69e669ca89369087c7618a"});
-const db=firebase.firestore();
 
 // Cursor
 const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
@@ -230,26 +226,23 @@ function attachItems(){
   gsap.timeline({onComplete:addTilt}).from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out'});
 }
 
-function cloudinaryThumb(url,w=1400){return url.replace('/upload/',`/upload/w_${w},c_limit,q_95/`);}
-
 async function loadGallery(){
   const grid=document.getElementById('grid');
   try{
-    const snap=await db.collection('gallery').orderBy('timestamp','desc').get();
-    if(snap.empty){
+    const data=await fetch('/data/gallery.json').then(r=>r.json());
+    if(!data.length){
       grid.innerHTML='<p style="column-span:all" class="py-20 text-center font-mono text-[10px] text-warm/40 tracking-widest uppercase">No photos yet</p>';
       return;
     }
     grid.innerHTML='';
-    snap.forEach(doc=>{
-      const d=doc.data();
+    data.forEach(d=>{
       const el=document.createElement('div');
       el.className='mitem';
       el.dataset.cat=d.category||'all';
       el.dataset.title=d.caption||'';
       el.dataset.date=d.dateLabel||'';
       el.dataset.src=d.url;
-      el.innerHTML=`<img src="${cloudinaryThumb(d.url)}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
+      el.innerHTML=`<img src="${d.url}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
       grid.appendChild(el);
     });
     attachItems();
