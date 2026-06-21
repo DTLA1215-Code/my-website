@@ -1,6 +1,7 @@
 export async function onRequest(context) {
   const path = context.params.path;
-  const qiniuUrl = `http://tgxdilfkh.hd-bkt.clouddn.com/${Array.isArray(path) ? path.join('/') : path}`;
+  const reqUrl = new URL(context.request.url);
+  const qiniuUrl = `http://tgxdilfkh.hd-bkt.clouddn.com/${Array.isArray(path) ? path.join('/') : path}${reqUrl.search}`;
 
   const rangeHeader = context.request.headers.get('Range');
   const fetchOptions = rangeHeader ? { headers: { Range: rangeHeader } } : {};
