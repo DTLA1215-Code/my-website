@@ -211,13 +211,34 @@ function attachVideoModal(){
   document.querySelectorAll('.vcard,.featured-card').forEach(el=>el.addEventListener('click',()=>openModal(el)));
 }
 
+// AUTO THUMBNAIL: capture first frame via canvas
+function captureThumbnail(videoUrl, imgEl) {
+  const video = document.createElement('video');
+  video.crossOrigin = 'anonymous';
+  video.muted = true;
+  video.preload = 'metadata';
+  video.addEventListener('loadedmetadata', () => { video.currentTime = 0.01; });
+  video.addEventListener('seeked', function h() {
+    video.removeEventListener('seeked', h);
+    try {
+      const c = document.createElement('canvas');
+      c.width = video.videoWidth || 640; c.height = video.videoHeight || 360;
+      c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+      imgEl.src = c.toDataURL('image/jpeg', 0.85);
+      imgEl.style.display = 'block';
+    } catch(e) {}
+    video.src = '';
+  });
+  video.src = videoUrl;
+}
+
 // Render featured card HTML
 function featuredHTML(d){
   const thumb=d.thumbnail||'';
+  const imgId='ft-'+d.id;
   return `<div class="featured-card cursor-pointer" data-title="${d.title||''}" data-date="${d.dateLabel||''}" data-dur="${d.duration||''}" data-desc="${d.description||''}" data-video="${d.url}">
     <div class="featured-thumb aspect-[21/9] bg-espresso/20">
-      ${thumb?`<img src="${thumb}" alt="${d.title||''}" loading="eager">`:''}
-
+      <img id="${imgId}" src="${thumb}" alt="${d.title||''}" loading="eager" style="${thumb?'':'display:none'}">
       <div class="featured-overlay">
         <div class="featured-play"><svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
       </div>
@@ -241,6 +262,7 @@ async function loadVideos(){
     }
     // Featured: first/latest video
     featSec.innerHTML=`<div class="max-w-7xl mx-auto">${featuredHTML(data[0])}</div>`;
+    if(!data[0].thumbnail) captureThumbnail(data[0].url, document.getElementById('ft-'+data[0].id));
     // Grid: remaining
     if(data.length<=1){
       grid.innerHTML='<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10 col-span-full text-center">More coming soon</p>';
@@ -248,12 +270,14 @@ async function loadVideos(){
       grid.innerHTML='';
       data.slice(1).forEach(d=>{
         const thumb=d.thumbnail||'';
+        const imgId='vt-'+d.id;
         const el=document.createElement('div');
         el.className='vcard';
         el.dataset.title=d.title||'';el.dataset.date=d.dateLabel||'';el.dataset.dur=d.duration||'';el.dataset.desc=d.description||'';el.dataset.video=d.url;
-        el.innerHTML=`<div class="vcard-thumb aspect-video bg-espresso/10">${thumb?`<img src="${thumb}" alt="${d.title||''}" loading="lazy">`:''}
+        el.innerHTML=`<div class="vcard-thumb aspect-video bg-espresso/10"><img id="${imgId}" src="${thumb}" alt="${d.title||''}" loading="lazy" style="${thumb?'':'display:none'}">
 <div class="vcard-overlay"><div class="play-btn"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vcard-bar mt-3 mb-3"></div><p class="font-mono text-[9px] text-caramel tracking-wider uppercase mb-1.5">${d.duration?d.duration+' · ':''}${d.dateLabel||''}</p><h3 class="font-serif text-lg text-espresso leading-tight">${d.title||''}</h3><p class="font-sans text-xs text-warm mt-1.5 leading-relaxed">${d.description||''}</p>`;
         grid.appendChild(el);
+        if(!thumb) captureThumbnail(d.url, document.getElementById(imgId));
       });
     }
     attachVideoModal();
@@ -261,7 +285,7 @@ async function loadVideos(){
     gsap.from('.vcard',{opacity:0,y:20,duration:.7,stagger:.07,ease:'power3.out',scrollTrigger:{trigger:'#video-grid',start:'top 80%'}});
   }catch(e){
     featSec.innerHTML='';
-    grid.innerHTML='<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-20 col-span-full text-center">Unable to load videos</p>';
+    grid.innerHTML='<p class="font-mono text-[10deg] text-warm/40 tracking-widest uppercase py-20 col-span-full text-center">Unable to load videos</p>';
   }
 }
 loadVideos();
