@@ -449,6 +449,27 @@ async function loadGalleryPreview() {
   }
 }
 
+// AUTO THUMBNAIL: capture first frame via canvas
+function captureThumbnail(videoUrl, imgEl) {
+  const video = document.createElement('video');
+  video.crossOrigin = 'anonymous';
+  video.muted = true;
+  video.preload = 'metadata';
+  video.addEventListener('loadedmetadata', () => { video.currentTime = 0.01; });
+  video.addEventListener('seeked', function h() {
+    video.removeEventListener('seeked', h);
+    try {
+      const c = document.createElement('canvas');
+      c.width = video.videoWidth || 640; c.height = video.videoHeight || 360;
+      c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+      imgEl.src = c.toDataURL('image/jpeg', 0.85);
+      imgEl.style.display = 'block';
+    } catch(e) {}
+    video.src = '';
+  });
+  video.src = videoUrl;
+}
+
 // LOAD VIDEOS PREVIEW
 async function loadVideosPreview() {
   const grid = document.getElementById('videos-grid');
@@ -461,10 +482,11 @@ async function loadVideosPreview() {
     grid.innerHTML = '';
     data.slice(0,2).forEach(d => {
       const thumb = d.thumbnail || '';
+      const uid = 'vt-' + d.id;
       const el = document.createElement('div');
       el.className = 'group vcard-home cursor-pointer';
       el.innerHTML = `<div class="gi rounded-sm aspect-video bg-mist">
-          ${thumb ? `<img src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" loading="lazy">` : ''}
+          <img id="${uid}" src="${thumb}" alt="${d.title||''}" class="w-full h-full object-cover" style="${thumb ? '' : 'display:none'}">
           <div class="ov absolute inset-0 bg-espresso/50 flex items-center justify-center">
             <div class="w-12 h-12 rounded-full border border-white/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -477,6 +499,7 @@ async function loadVideosPreview() {
         </div>`;
       el.addEventListener('click', () => openVidModal(d.url, d.title||''));
       grid.appendChild(el);
+      if (!thumb) captureThumbnail(d.url, document.getElementById(uid));
     });
   } catch(e) {
     grid.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Unable to load</p>';
