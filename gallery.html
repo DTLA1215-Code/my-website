@@ -245,7 +245,7 @@ async function loadGallery(){
       el.dataset.title=d.caption||'';
       el.dataset.date=d.dateLabel||'';
       el.dataset.src=d.url;
-      el.innerHTML=`<img src="${qnImg(d.url, 900)}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
+      el.innerHTML=`<img src="${qnImg(d.url, 900)}" onerror="this.onerror=null;this.src='${d.url}'" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
       grid.appendChild(el);
     });
     attachItems();
