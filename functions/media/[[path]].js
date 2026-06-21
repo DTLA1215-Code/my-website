@@ -25,7 +25,10 @@ export async function onRequest(context) {
     png: 'image/png',
     webp: 'image/webp',
   };
-  if (mimeMap[ext]) headers.set('Content-Type', mimeMap[ext]);
+  // Skip Content-Type override when Qiniu processing pipeline is active (e.g. vframe, imageView2),
+  // as those requests return a different format than the source file extension suggests.
+  const hasProcessing = reqUrl.search && /vframe|imageView|imageMogr|watermark/.test(reqUrl.search);
+  if (mimeMap[ext] && !hasProcessing) headers.set('Content-Type', mimeMap[ext]);
 
   return new Response(response.body, { status: response.status, headers });
 }
