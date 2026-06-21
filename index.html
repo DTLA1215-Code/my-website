@@ -152,7 +152,7 @@
       <source src="assets/sea_mobile.mp4" type="video/mp4">
       <source src="assets/sea.mp4" type="video/mp4">
     </video>
-    <script>(function(){if(window.innerWidth>=768){var v=document.getElementById('hero-vid');v.src='assets/sea.mp4';v.load();}}())</script>
+    <script>(function(){var v=document.getElementById('hero-vid');if(window.innerWidth>=768){v.src='assets/sea.mp4';}v.muted=true;v.load();v.play().catch(function(){document.addEventListener('touchstart',function(){v.play().catch(function(){});},{once:true});});}())</script>
   </div>
   <div class="absolute inset-0 z-[1]" style="background: linear-gradient(to top, #FAF7F2 6%, rgba(250,247,242,0.6) 22%, transparent 42%)"></div>
   <div class="relative z-10 w-full px-8 md:px-14">
