@@ -287,7 +287,7 @@ async function loadVideos(){
     }
     attachVideoModal();
     gsap.from('.featured-card',{opacity:0,y:24,duration:.9,ease:'power3.out',delay:.35});
-    gsap.from('.vcard',{opacity:0,y:20,duration:.7,stagger:.07,ease:'power3.out',scrollTrigger:{trigger:'#video-grid',start:'top 80%'}});
+    gsap.from('.vcard',{opacity:0,y:20,duration:.7,stagger:.07,ease:'power3.out',delay:.15});
   }catch(e){
     featSec.innerHTML='';
     grid.innerHTML='<p class="font-mono text-[10deg] text-warm/40 tracking-widest uppercase py-20 col-span-full text-center">Unable to load videos</p>';
