@@ -212,14 +212,10 @@ function attachVideoModal(){
 
 // VIDEO THUMBNAIL: use Qiniu vframe API, fallback to Canvas
 function loadVideoThumb(videoUrl, imgEl) {
-  if (!videoUrl) return;
-  if (videoUrl.startsWith('/media/')) {
-    imgEl.src = videoUrl + '?vframe/jpg/offset/1';
-    imgEl.style.display = 'block';
-    imgEl.onerror = function() { imgEl.style.display = 'none'; captureThumbnail(videoUrl, imgEl); };
-  } else {
-    captureThumbnail(videoUrl, imgEl);
-  }
+  if (!videoUrl || !videoUrl.startsWith('/media/')) return;
+  imgEl.src = videoUrl + '?vframe/jpg/offset/1';
+  imgEl.style.display = 'block';
+  imgEl.onerror = function() { imgEl.style.display = 'none'; };
 }
 function captureThumbnail(videoUrl, imgEl) {
   const video = document.createElement('video');
