@@ -149,8 +149,8 @@
     <video id="hero-vid" autoplay muted loop playsinline preload="auto"
            poster="assets/sea_poster.jpg"
            class="absolute inset-0 w-full h-full object-cover" style="opacity:.78">
-      <source src="assets/sea.mp4" type="video/mp4">
     </video>
+    <script>(function(){var v=document.getElementById('hero-vid');v.src=window.innerWidth<768?'assets/sea_mobile.mp4':'assets/sea.mp4';}())</script>
   </div>
   <div class="absolute inset-0 z-[1]" style="background: linear-gradient(to top, #FAF7F2 6%, rgba(250,247,242,0.6) 22%, transparent 42%)"></div>
   <div class="relative z-10 w-full px-8 md:px-14">
@@ -411,6 +411,10 @@ function addGiTilt(){
 }
 
 // LOAD GALLERY PREVIEW
+function qnImg(url, w) {
+  return (url && url.startsWith('/media/')) ? url + '?imageView2/2/w/' + w + '/q/80' : url;
+}
+
 async function loadGalleryPreview() {
   const grid = document.getElementById('gallery-grid');
   try {
@@ -424,7 +428,7 @@ async function loadGalleryPreview() {
     const big = document.createElement('a');
     big.href = 'gallery.html';
     big.className = 'gi rounded-sm overflow-hidden block h-full';
-    big.innerHTML = `<img src="${d0.url}" alt="${d0.caption||''}" class="w-full h-full object-cover" loading="lazy">
+    big.innerHTML = `<img src="${qnImg(d0.url, 900)}" alt="${d0.caption||''}" class="w-full h-full object-cover" loading="lazy">
       <div class="ov absolute inset-0 bg-espresso/40 flex items-end p-5 md:p-8">
         <div><p class="font-mono text-[9px] tracking-widest text-sand/80 uppercase mb-1">${d0.dateLabel||''}</p><p class="font-serif text-white text-lg md:text-2xl leading-tight">${d0.caption||''}</p></div>
       </div>`;
@@ -435,7 +439,7 @@ async function loadGalleryPreview() {
       const el = document.createElement('a');
       el.href = 'gallery.html';
       el.className = 'gi rounded-sm overflow-hidden block h-full';
-      el.innerHTML = `<img src="${d.url}" alt="${d.caption||''}" class="w-full h-full object-cover" loading="lazy">
+      el.innerHTML = `<img src="${qnImg(d.url, 500)}" alt="${d.caption||''}" class="w-full h-full object-cover" loading="lazy">
         <div class="ov absolute inset-0 bg-espresso/40 flex items-end p-4 md:p-5">
           <p class="font-serif text-white text-sm md:text-base leading-tight">${d.caption||''}</p>
         </div>`;
@@ -448,7 +452,7 @@ async function loadGalleryPreview() {
   }
 }
 
-// AUTO THUMBNAIL: capture first frame via canvas
+// VIDEO THUMBNAIL: use Qiniu vframe API, fallback to Canvas
 function captureThumbnail(videoUrl, imgEl) {
   const video = document.createElement('video');
   video.crossOrigin = 'anonymous';
@@ -467,6 +471,16 @@ function captureThumbnail(videoUrl, imgEl) {
     video.src = '';
   });
   video.src = videoUrl;
+}
+function loadVideoThumb(videoUrl, imgEl) {
+  if (!videoUrl) return;
+  if (videoUrl.startsWith('/media/')) {
+    imgEl.src = videoUrl + '?vframe/jpg/offset/1';
+    imgEl.style.display = 'block';
+    imgEl.onerror = function() { imgEl.style.display = 'none'; captureThumbnail(videoUrl, imgEl); };
+  } else {
+    captureThumbnail(videoUrl, imgEl);
+  }
 }
 
 // LOAD VIDEOS PREVIEW
@@ -498,7 +512,7 @@ async function loadVideosPreview() {
         </div>`;
       el.addEventListener('click', () => openVidModal(d.url, d.title||''));
       grid.appendChild(el);
-      if (!thumb) captureThumbnail(d.url, document.getElementById(uid));
+      if (!thumb) loadVideoThumb(d.url, document.getElementById(uid));
     });
   } catch(e) {
     grid.innerHTML = '<p class="font-mono text-[10px] text-warm/40 tracking-widest uppercase py-10">Unable to load</p>';
