@@ -1,8 +1,19 @@
 [
   {
+    "id": "video_1782054120561_8323.mp4",
+    "url": "\/media\/video_1782054120561_8323.mp4",
+    "thumbnail": "\/media\/thumb_1782054079206_4094.jpg",
+    "title": "赛龙舟",
+    "description": "",
+    "duration": "1:25",
+    "dateLabel": "Jun 19, 2026",
+    "year": "2026",
+    "timestamp": 1781827200000
+  },
+  {
     "id": "video_1782050374364_4272_c.mp4",
-    "url": "/media/video_1782050374364_4272_c.mp4",
-    "thumbnail": "/media/thumb_1782050364537_5784.jpg",
+    "url": "\/media\/video_1782050374364_4272_c.mp4",
+    "thumbnail": "\/media\/thumb_1782050364537_5784.jpg",
     "title": "新城广场",
     "description": "",
     "duration": "0:14",
@@ -12,8 +23,8 @@
   },
   {
     "id": "video_1782049725013_8857_c.mp4",
-    "url": "/media/video_1782049725013_8857_c.mp4",
-    "thumbnail": "/media/thumb_1782049716784_3715.jpg",
+    "url": "\/media\/video_1782049725013_8857_c.mp4",
+    "thumbnail": "\/media\/thumb_1782049716784_3715.jpg",
     "title": "大鸽饭",
     "description": "",
     "duration": "0:14",
@@ -23,8 +34,8 @@
   },
   {
     "id": "video_1781970069096_4490_c.mp4",
-    "url": "/media/video_1781970069096_4490_c.mp4",
-    "thumbnail": "/media/thumb_vid3_c.jpg",
+    "url": "\/media\/video_1781970069096_4490_c.mp4",
+    "thumbnail": "\/media\/thumb_vid3_c.jpg",
     "title": "广州猎德赛龙舟",
     "description": "",
     "duration": "0:13",
