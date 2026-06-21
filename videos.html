@@ -186,20 +186,33 @@ const vtitle=document.getElementById('vmodal-title');
 const vmeta=document.getElementById('vmodal-meta');
 const vdesc=document.getElementById('vmodal-desc');
 
+let _stallTimer;
 function openModal(el){
   vtitle.textContent=el.dataset.title||'';
-  vmeta.textContent=(el.dataset.dur?el.dataset.dur+' · ':'')+( el.dataset.date||'');
-  vdesc.textContent=el.dataset.desc||'';
+  vmeta.textContent=(el.dataset.dur?el.dataset.dur+' · ':'')+(el.dataset.date||'');
+  const origDesc=el.dataset.desc||'';
+  vdesc.textContent=origDesc;
+  vvideo.onerror=()=>{ clearTimeout(_stallTimer); vdesc.textContent='视频文件已损坏，请重新上传。'; };
   vvideo.src=el.dataset.video;
   vvideo.load();
   vmodal.classList.add('open');
   document.body.style.overflow='hidden';
   vvideo.play().catch(()=>{});
+  // Fallback: empty MP4 containers won't fire onerror, detect via readyState timeout
+  clearTimeout(_stallTimer);
+  _stallTimer=setTimeout(()=>{
+    if(vvideo.readyState<3&&vvideo.currentTime===0&&!vvideo.error){
+      vdesc.textContent='视频文件已损坏，请重新上传。';
+    }
+  },4000);
+  vvideo.addEventListener('canplay',()=>clearTimeout(_stallTimer),{once:true});
 }
 function closeModal(){
+  clearTimeout(_stallTimer);
   vmodal.classList.remove('open');
   vvideo.pause();
   vvideo.src='';
+  vvideo.onerror=null;
   document.body.style.overflow='';
 }
 document.getElementById('vmodal-close').addEventListener('click',closeModal);
