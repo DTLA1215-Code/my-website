@@ -225,6 +225,10 @@ function attachItems(){
   gsap.timeline({onComplete:addTilt}).from('.mitem',{opacity:0,y:24,duration:.7,stagger:.05,ease:'power3.out'});
 }
 
+function qnImg(url, w) {
+  return (url && url.startsWith('/media/')) ? url + '?imageView2/2/w/' + w + '/q/80' : url;
+}
+
 async function loadGallery(){
   const grid=document.getElementById('grid');
   try{
@@ -241,7 +245,7 @@ async function loadGallery(){
       el.dataset.title=d.caption||'';
       el.dataset.date=d.dateLabel||'';
       el.dataset.src=d.url;
-      el.innerHTML=`<img src="${d.url}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
+      el.innerHTML=`<img src="${qnImg(d.url, 900)}" alt="${d.caption||''}" loading="lazy"><div class="ov"><div><p class="font-mono text-[8px] tracking-widest text-sand/75 uppercase mb-1">${d.dateLabel||''}</p><p class="font-serif text-white text-base leading-tight">${d.caption||''}</p></div></div>`;
       grid.appendChild(el);
     });
     attachItems();
